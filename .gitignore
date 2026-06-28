@@ -1,0 +1,4 @@
+node_modules/
+dist/
+forge-installer.jar
+*.log

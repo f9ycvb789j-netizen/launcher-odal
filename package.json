@@ -1,0 +1,40 @@
+{
+  "name": "launcher-odal",
+  "version": "1.0.0",
+  "description": "Launcher Serveur Odal",
+  "main": "main.js",
+  "scripts": {
+    "start": "powershell -Command \"$env:ELECTRON_RUN_AS_NODE=$null; node node_modules/electron/cli.js .\"",
+    "build:win": "electron-builder --win portable",
+    "build:mac": "electron-builder --mac dmg",
+    "build": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "gg.odal.launcher",
+    "productName": "Odal Launcher",
+    "files": ["main.js", "preload.js", "index.html", "renderer.js", "mods-manifest.json", "mods-pack/**", "node_modules/**"],
+    "win": {
+      "target": "portable",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.games"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "minecraft-launcher-core": "^3.18.2",
+    "msmc": "^4.1.0"
+  },
+  "allowScripts": {
+    "electron@31.7.7": true,
+    "electron-winstaller@5.4.0": true
+  }
+}

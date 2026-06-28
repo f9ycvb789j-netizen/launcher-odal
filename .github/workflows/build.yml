@@ -1,0 +1,41 @@
+name: Build Launcher
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build Windows
+        run: npm run build:win
+      - name: Upload Windows exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: Odal-Launcher-Windows
+          path: dist/*.exe
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build Mac
+        run: npm run build:mac
+      - name: Upload Mac dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: Odal-Launcher-Mac
+          path: dist/*.dmg

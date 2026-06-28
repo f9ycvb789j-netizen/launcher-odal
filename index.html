@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Launcher Odal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&family=Lato:wght@300;400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 900px; height: 550px;
+      font-family: 'Lato', sans-serif;
+      background: #040810;
+      color: #e8d5b0;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Fond océan / nuit */
+    #bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 110%, #0d2a4a 0%, transparent 60%),
+        radial-gradient(ellipse at 50% -20%, #0a1929 0%, transparent 60%),
+        linear-gradient(180deg, #040810 0%, #070e1c 50%, #04080f 100%);
+    }
+
+    /* Lueur centrale dorée */
+    #glow {
+      position: absolute;
+      left: 50%; top: 55%;
+      transform: translate(-50%, -50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse, rgba(180, 130, 30, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Lignes décoratives horizontales */
+    #lines-top, #lines-bottom {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(180,130,30,0.3), rgba(201,162,39,0.7), rgba(180,130,30,0.3), transparent);
+    }
+    #lines-top { top: 36px; }
+    #lines-bottom { bottom: 36px; }
+
+    /* Coin décoratif */
+    .corner {
+      position: absolute;
+      width: 40px; height: 40px;
+      border-color: rgba(201,162,39,0.4);
+      border-style: solid;
+    }
+    .corner.tl { top: 44px; left: 14px; border-width: 1px 0 0 1px; }
+    .corner.tr { top: 44px; right: 14px; border-width: 1px 1px 0 0; }
+    .corner.bl { bottom: 44px; left: 14px; border-width: 0 0 1px 1px; }
+    .corner.br { bottom: 44px; right: 14px; border-width: 0 1px 1px 0; }
+
+    /* Étoiles / particules */
+    #stars { position: absolute; inset: 0; pointer-events: none; }
+    .star {
+      position: absolute;
+      background: #c9a227;
+      border-radius: 50%;
+      animation: twinkle ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Barre de titre */
+    #titlebar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      -webkit-app-region: drag;
+      z-index: 10;
+    }
+    #titlebar span {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      color: rgba(201,162,39,0.5);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+    .win-btn {
+      -webkit-app-region: no-drag;
+      background: none; border: none; cursor: pointer;
+      color: rgba(201,162,39,0.4); font-size: 13px; padding: 4px 8px;
+      border-radius: 3px; transition: all 0.2s;
+    }
+    .win-btn:hover { color: #c9a227; background: rgba(201,162,39,0.08); }
+    #btn-close:hover { color: #e05a5a; background: rgba(224,90,90,0.1); }
+    .win-btns { display: flex; gap: 2px; -webkit-app-region: no-drag; }
+
+    /* Contenu */
+    #content {
+      position: absolute;
+      inset: 36px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    /* Symbole ancre / épée */
+    .icon-symbol {
+      font-size: 28px;
+      color: rgba(201,162,39,0.6);
+      letter-spacing: 16px;
+      margin-bottom: -4px;
+    }
+
+    /* Titre ODAL */
+    .server-name {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: 10px;
+      color: #c9a227;
+      text-shadow:
+        0 0 20px rgba(201,162,39,0.5),
+        0 0 60px rgba(201,162,39,0.2),
+        0 2px 4px rgba(0,0,0,0.8);
+      line-height: 1;
+    }
+
+    /* Ligne décorative sous titre */
+    .title-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: -4px 0 2px;
+    }
+    .title-divider span { color: rgba(201,162,39,0.5); font-size: 14px; }
+    .title-divider::before, .title-divider::after {
+      content: '';
+      width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,162,39,0.5));
+    }
+    .title-divider::after { background: linear-gradient(270deg, transparent, rgba(201,162,39,0.5)); }
+
+    .server-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      color: rgba(201,162,39,0.45);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-top: -8px;
+    }
+
+    /* Info utilisateur */
+    #user-info {
+      font-size: 13px;
+      color: rgba(232,213,176,0.6);
+      letter-spacing: 1px;
+      display: none;
+      font-weight: 300;
+    }
+    #user-info strong { color: #c9a227; font-weight: 400; }
+
+    /* Bouton principal */
+    #btn-join {
+      margin-top: 6px;
+      background: linear-gradient(180deg, #c9a227 0%, #a07c18 50%, #8a6912 100%);
+      color: #1a0e00;
+      border: none;
+      cursor: pointer;
+      border-radius: 3px;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 14px 52px;
+      width: 280px;
+      position: relative;
+      transition: all 0.2s;
+      box-shadow:
+        0 0 20px rgba(201,162,39,0.3),
+        0 4px 12px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,220,100,0.4);
+    }
+    #btn-join::before {
+      content: '⚓';
+      margin-right: 10px;
+      font-size: 13px;
+    }
+    #btn-join:hover {
+      background: linear-gradient(180deg, #e0b830 0%, #c9a227 50%, #a07c18 100%);
+      box-shadow:
+        0 0 35px rgba(201,162,39,0.5),
+        0 4px 16px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,220,100,0.5);
+      transform: translateY(-1px);
+    }
+    #btn-join:active { transform: translateY(1px); }
+    #btn-join:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Barre de progression */
+    #progress-zone {
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      margin-top: 4px;
+    }
+    #progress-bar-bg {
+      width: 100%;
+      height: 3px;
+      background: rgba(201,162,39,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8a6912, #c9a227, #e0c050);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px rgba(201,162,39,0.6);
+    }
+    #status-text {
+      font-size: 11px;
+      color: rgba(201,162,39,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+    }
+
+    /* Version */
+    #version {
+      position: absolute;
+      bottom: 10px;
+      right: 18px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      color: rgba(201,162,39,0.2);
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bg"></div>
+  <div id="glow"></div>
+  <div id="stars"></div>
+  <div id="lines-top"></div>
+  <div id="lines-bottom"></div>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <div id="titlebar">
+    <span>Odal · Launcher</span>
+    <div class="win-btns">
+      <button class="win-btn" id="btn-min">—</button>
+      <button class="win-btn" id="btn-close">✕</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div class="icon-symbol">⚓ &nbsp; ⚔</div>
+    <div class="server-name">ODAL</div>
+    <div class="title-divider"><span>✦</span></div>
+    <div class="server-sub">Minecraft 1.20.1 &nbsp;·&nbsp; Forge</div>
+
+    <div id="user-info">Conquérant : <strong id="username-display"></strong></div>
+
+    <button id="btn-join">Rejoindre Odal</button>
+
+    <div id="progress-zone">
+      <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+      <div id="status-text">En attente...</div>
+    </div>
+  </div>
+
+  <div id="version">v1.0.0</div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
