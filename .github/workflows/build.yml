@@ -17,7 +17,7 @@ jobs:
         run: npm install
       - name: Build Windows
         run: npm run build:win
-      - name: Upload Windows exe
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: Odal-Launcher-Windows
@@ -37,8 +37,36 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:mac
-      - name: Upload Mac dmg
+      - name: Upload Mac artifact
         uses: actions/upload-artifact@v4
         with:
           name: Odal-Launcher-Mac
           path: dist/*.dmg
+
+  release:
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: Odal-Launcher-Windows
+          path: ./windows
+
+      - name: Download Mac build
+        uses: actions/download-artifact@v4
+        with:
+          name: Odal-Launcher-Mac
+          path: ./mac
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Odal Launcher - Dernière version"
+          body: "Télécharge le launcher pour rejoindre le serveur Odal !"
+          files: |
+            ./windows/*.exe
+            ./mac/*.dmg
