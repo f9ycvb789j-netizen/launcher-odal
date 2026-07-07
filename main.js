@@ -66,8 +66,37 @@ async function checkForUpdates() {
       });
 
       const currentExe = process.execPath;
+      const currentPid = process.pid;
       const batPath = path.join(os.tmpdir(), 'odal_update.bat');
-      fs.writeFileSync(batPath, `@echo off\r\ntimeout /t 2 /nobreak > nul\r\ncopy /y "${tmpExe}" "${currentExe}"\r\nstart "" "${currentExe}"\r\ndel "%~f0"\r\n`);
+      // Attend que l'ancien processus soit vraiment termine, puis reessaie la copie
+      // (peut echouer une premiere fois si le fichier est encore verrouille, ex: antivirus).
+      const batScript = [
+        '@echo off',
+        `set PID=${currentPid}`,
+        `set SRC="${tmpExe}"`,
+        `set DST="${currentExe}"`,
+        ':waitproc',
+        'tasklist /fi "PID eq %PID%" 2>nul | find "%PID%" >nul',
+        'if not errorlevel 1 (',
+        '  timeout /t 1 /nobreak > nul',
+        '  goto waitproc',
+        ')',
+        'set /a tries=0',
+        ':copyretry',
+        'copy /y %SRC% %DST% >nul 2>&1',
+        'if errorlevel 1 (',
+        '  set /a tries+=1',
+        '  if %tries% lss 20 (',
+        '    timeout /t 1 /nobreak > nul',
+        '    goto copyretry',
+        '  )',
+        ')',
+        'start "" %DST%',
+        'del %SRC% >nul 2>&1',
+        'del "%~f0"',
+        ''
+      ].join('\r\n');
+      fs.writeFileSync(batPath, batScript);
 
       cp.spawn('cmd.exe', ['/c', batPath], { detached: true, stdio: 'ignore' }).unref();
       app.quit();
