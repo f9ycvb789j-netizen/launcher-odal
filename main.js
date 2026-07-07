@@ -66,33 +66,32 @@ async function checkForUpdates() {
       });
 
       const currentExe = process.execPath;
-      const currentPid = process.pid;
       const batPath = path.join(os.tmpdir(), 'odal_update.bat');
-      // Attend que l'ancien processus soit vraiment termine, puis reessaie la copie
-      // (peut echouer une premiere fois si le fichier est encore verrouille, ex: antivirus).
+      const logPath = path.join(os.tmpdir(), 'odal_update_log.txt');
+      // Reessaie la copie (le fichier peut etre encore verrouille juste apres la fermeture).
+      // Important : pas de goto imbrique dans un bloc if(...) parenthese, c'est instable en batch
+      // et peut faire planter le script instantanement sans rien faire.
       const batScript = [
         '@echo off',
-        `set PID=${currentPid}`,
+        `set LOG="${logPath}"`,
         `set SRC="${tmpExe}"`,
         `set DST="${currentExe}"`,
-        ':waitproc',
-        'tasklist /fi "PID eq %PID%" 2>nul | find "%PID%" >nul',
-        'if not errorlevel 1 (',
-        '  timeout /t 1 /nobreak > nul',
-        '  goto waitproc',
-        ')',
-        'set /a tries=0',
+        'echo Debut mise a jour > %LOG% 2>&1',
+        'set tries=0',
         ':copyretry',
-        'copy /y %SRC% %DST% >nul 2>&1',
-        'if errorlevel 1 (',
-        '  set /a tries+=1',
-        '  if %tries% lss 20 (',
-        '    timeout /t 1 /nobreak > nul',
-        '    goto copyretry',
-        '  )',
-        ')',
+        'timeout /t 1 /nobreak > nul',
+        'copy /y %SRC% %DST% >> %LOG% 2>&1',
+        'if not errorlevel 1 goto copied',
+        'set /a tries+=1',
+        'echo tentative %tries% echouee >> %LOG%',
+        'if %tries% lss 25 goto copyretry',
+        'echo ECHEC apres 25 tentatives >> %LOG%',
+        'goto end',
+        ':copied',
+        'echo Copie reussie, relance >> %LOG%',
         'start "" %DST%',
         'del %SRC% >nul 2>&1',
+        ':end',
         'del "%~f0"',
         ''
       ].join('\r\n');
