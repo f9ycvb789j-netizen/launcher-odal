@@ -1,0 +1,72 @@
+name: Build Launcher
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build Windows
+        run: npm run build:win
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Odal-Launcher-Windows
+          path: dist/*.exe
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Build Mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:mac
+      - name: Upload Mac artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Odal-Launcher-Mac
+          path: dist/*.dmg
+
+  release:
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: Odal-Launcher-Windows
+          path: ./windows
+
+      - name: Download Mac build
+        uses: actions/download-artifact@v4
+        with:
+          name: Odal-Launcher-Mac
+          path: ./mac
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Odal Launcher - Dernière version"
+          body: "Télécharge le launcher pour rejoindre le serveur Odal !"
+          files: |
+            ./windows/*.exe
+            ./mac/*.dmg
