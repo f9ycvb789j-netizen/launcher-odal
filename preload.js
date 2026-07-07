@@ -1,0 +1,15 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('launcher', {
+  minimize: () => ipcRenderer.send('minimize'),
+  close: () => ipcRenderer.send('close'),
+  loginSite: (username, password) => ipcRenderer.invoke('login-site', username, password),
+  registerSite: (mc_username, email, password) => ipcRenderer.invoke('register-site', mc_username, email, password),
+  launch: () => ipcRenderer.invoke('launch'),
+  on: (channel, cb) => ipcRenderer.on(channel, (_, data) => cb(data)),
+  openUrl: (url) => ipcRenderer.send('open-url', url),
+  getSiteApi: () => ipcRenderer.invoke('get-site-api'),
+  saveCredentials: (username, password) => ipcRenderer.invoke('save-credentials', username, password),
+  loadCredentials: () => ipcRenderer.invoke('load-credentials'),
+  clearCredentials: () => ipcRenderer.invoke('clear-credentials')
+});
