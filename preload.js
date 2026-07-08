@@ -10,9 +10,15 @@ contextBridge.exposeInMainWorld('launcher', {
   openUrl: (url) => ipcRenderer.send('open-url', url),
   getSiteApi: () => ipcRenderer.invoke('get-site-api'),
   saveCredentials: (username, password) => ipcRenderer.invoke('save-credentials', username, password),
-  loadCredentials: () => ipcRenderer.invoke('load-credentials'),
-  clearCredentials: () => ipcRenderer.invoke('clear-credentials'),
+  getAccounts: () => ipcRenderer.invoke('get-accounts'),
+  getLastAccount: () => ipcRenderer.invoke('get-last-account'),
+  loginWithSavedAccount: (username) => ipcRenderer.invoke('login-with-saved-account', username),
+  removeAccount: (username) => ipcRenderer.invoke('remove-account', username),
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
-  getSystemMemoryGB: () => ipcRenderer.invoke('get-system-memory-gb')
+  getSystemMemoryGB: () => ipcRenderer.invoke('get-system-memory-gb'),
+  getServerStatus: () => ipcRenderer.invoke('get-server-status'),
+  getNews: () => ipcRenderer.invoke('get-news'),
+  logout: () => ipcRenderer.invoke('logout'),
+  openGameFolder: (key) => ipcRenderer.invoke('open-game-folder', key)
 });

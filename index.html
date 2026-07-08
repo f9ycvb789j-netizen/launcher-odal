@@ -7,9 +7,10 @@
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&family=Lato:wght@300;400&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    .hidden { display: none !important; }
 
     body {
-      width: 900px; height: 550px;
+      width: 1150px; height: 650px;
       font-family: 'Lato', sans-serif;
       background: #040810;
       color: #e8d5b0;
@@ -106,11 +107,106 @@
       position: absolute;
       inset: 36px 0 0 0;
       display: flex;
+      flex-direction: row;
+    }
+
+    /* Colonne actualites */
+    #news-panel {
+      width: 350px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 26px 22px;
+      border-right: 1px solid rgba(201,162,39,0.15);
+    }
+    .news-panel-header {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: rgba(201,162,39,0.6);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(201,162,39,0.2);
+    }
+    #news-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 6px;
+    }
+    #news-list::-webkit-scrollbar { width: 5px; }
+    #news-list::-webkit-scrollbar-thumb { background: rgba(201,162,39,0.25); border-radius: 3px; }
+    #news-list::-webkit-scrollbar-track { background: transparent; }
+    .news-card {
+      background: rgba(201,162,39,0.04);
+      border: 1px solid rgba(201,162,39,0.15);
+      border-radius: 5px;
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+    .news-card:hover { border-color: rgba(201,162,39,0.35); }
+    .news-date {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: rgba(201,162,39,0.5);
+      text-transform: uppercase;
+    }
+    .news-title {
+      font-size: 16px;
+      color: #e8d5b0;
+      margin: 8px 0 6px;
+      font-weight: 600;
+    }
+    .news-excerpt {
+      font-size: 13.5px;
+      color: rgba(232,213,176,0.6);
+      line-height: 1.5;
+      font-weight: 300;
+    }
+    .news-empty {
+      font-size: 11px;
+      color: rgba(201,162,39,0.3);
+      text-align: center;
+      margin-top: 30px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    /* Zone principale (jeu) */
+    #main-panel {
+      flex: 1;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 14px;
+      position: relative;
     }
+
+    /* Statut serveur */
+    #server-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: rgba(232,213,176,0.6);
+      text-transform: uppercase;
+      margin-top: -6px;
+    }
+    #server-status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #666;
+      flex-shrink: 0;
+    }
+    #server-status-dot.online { background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.7); }
+    #server-status-dot.offline { background: #e05a5a; box-shadow: 0 0 8px rgba(224,90,90,0.6); }
 
     /* Symbole ancre / épée */
     .icon-symbol {
@@ -363,12 +459,63 @@
       cursor: pointer;
     }
 
+    #account-picker { display: flex; flex-direction: column; gap: 10px; width: 280px; }
+    .account-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .account-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(201,162,39,0.05);
+      border: 1px solid rgba(201,162,39,0.2);
+      border-radius: 4px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .account-row:hover { border-color: rgba(201,162,39,0.5); background: rgba(201,162,39,0.1); }
+    .account-row.active { border-color: rgba(201,162,39,0.6); background: rgba(201,162,39,0.12); }
+    .account-row.active .account-row-name { color: #c9a227; }
+    .account-row-avatar {
+      width: 26px; height: 26px;
+      image-rendering: pixelated;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .account-row-name {
+      flex: 1;
+      font-size: 13px;
+      color: #e8d5b0;
+    }
+    .account-row-remove {
+      background: none;
+      border: none;
+      color: rgba(232,213,176,0.3);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .account-row-remove:hover { color: #e07a7a; }
+    .account-section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: rgba(201,162,39,0.4);
+      text-transform: uppercase;
+      margin-top: 16px;
+    }
+
     #user-info {
       display: none;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 4px;
+      transition: background 0.2s;
     }
+    #user-info:hover { background: rgba(201,162,39,0.08); }
     #skin-head {
       width: 32px;
       height: 32px;
@@ -389,26 +536,112 @@
     }
     #settings-overlay.hidden { display: none; }
     #settings-panel {
-      width: 300px;
+      position: relative;
+      width: 680px;
+      height: 420px;
       background: linear-gradient(180deg, #0a1220 0%, #060a12 100%);
       border: 1px solid rgba(201,162,39,0.35);
       border-radius: 6px;
-      padding: 22px 24px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.6);
       display: flex;
-      flex-direction: column;
-      gap: 16px;
+      overflow: hidden;
     }
-    .settings-title {
-      font-family: 'Cinzel', serif;
+    #settings-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none;
+      border: none;
+      color: rgba(232,213,176,0.4);
       font-size: 15px;
+      cursor: pointer;
+      z-index: 2;
+      transition: color 0.2s;
+    }
+    #settings-close:hover { color: #c9a227; }
+
+    #settings-sidebar {
+      width: 180px;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.25);
+      border-right: 1px solid rgba(201,162,39,0.15);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .settings-tab {
+      background: none;
+      border: none;
+      text-align: left;
+      color: rgba(232,213,176,0.55);
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      padding: 10px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .settings-tab:hover { color: #e8d5b0; background: rgba(201,162,39,0.06); }
+    .settings-tab.active { color: #c9a227; background: rgba(201,162,39,0.12); }
+
+    #settings-content {
+      flex: 1;
+      padding: 30px 36px;
+      overflow-y: auto;
+    }
+    .settings-tab-content.hidden { display: none !important; }
+    .settings-page-title {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
       letter-spacing: 2px;
       color: #c9a227;
       text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 2px;
+      margin-bottom: 22px;
     }
-    .setting-row { display: flex; flex-direction: column; gap: 8px; }
+    #tab-account { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+    #settings-skin {
+      width: 140px;
+      height: 140px;
+      image-rendering: pixelated;
+      border: 1px solid rgba(201,162,39,0.4);
+      border-radius: 5px;
+    }
+    #settings-username {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      color: #e8d5b0;
+      letter-spacing: 1px;
+    }
+    .settings-action-btn {
+      background: rgba(201,162,39,0.1);
+      border: 1px solid rgba(201,162,39,0.35);
+      color: #c9a227;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .settings-action-btn:hover { background: rgba(201,162,39,0.2); }
+    .settings-desc {
+      font-size: 12.5px;
+      color: rgba(232,213,176,0.55);
+      line-height: 1.5;
+      max-width: 420px;
+      margin-bottom: 18px;
+    }
+    .settings-action-btn.danger {
+      color: #e07a7a;
+      border-color: rgba(224,90,90,0.35);
+      background: rgba(224,90,90,0.08);
+    }
+    .settings-action-btn.danger:hover { background: rgba(224,90,90,0.16); }
+
+    .setting-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
     .setting-row label {
       font-size: 12px;
       color: rgba(232,213,176,0.7);
@@ -418,20 +651,6 @@
       width: 100%;
       accent-color: #c9a227;
     }
-    #settings-close {
-      background: rgba(201,162,39,0.12);
-      border: 1px solid rgba(201,162,39,0.4);
-      color: #c9a227;
-      font-family: 'Cinzel', serif;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 9px;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    #settings-close:hover { background: rgba(201,162,39,0.22); }
   </style>
 </head>
 <body>
@@ -464,62 +683,132 @@
 
   <div id="settings-overlay" class="hidden">
     <div id="settings-panel">
-      <div class="settings-title">Paramètres</div>
+      <button id="settings-close" title="Fermer">✕</button>
 
-      <div class="setting-row">
-        <label>Mémoire allouée : <strong id="ram-value">4</strong> Go</label>
-        <input type="range" id="ram-slider" min="1" max="16" step="1" value="4">
+      <div id="settings-sidebar">
+        <button class="settings-tab active" data-tab="account">Compte</button>
+        <button class="settings-tab" data-tab="skin">Skin</button>
+        <button class="settings-tab" data-tab="params">Paramètres</button>
+        <button class="settings-tab" data-tab="resourcepacks">Packs de ressources</button>
+        <button class="settings-tab" data-tab="shaderpacks">Packs de shaders</button>
+        <button class="settings-tab" data-tab="screenshots">Captures d'écran</button>
+        <button class="settings-tab" data-tab="crashreports">Rapports de crash</button>
       </div>
 
-      <label class="remember-row"><input type="checkbox" id="close-on-launch"> Fermer le launcher une fois le jeu lancé</label>
+      <div id="settings-content">
+        <div id="tab-account" class="settings-tab-content">
+          <div class="settings-page-title">Mon compte</div>
+          <div id="settings-username">Non connecté</div>
+          <div class="account-section-label">Comptes enregistrés</div>
+          <div id="settings-account-list" class="account-list"></div>
+          <button id="btn-add-account" class="settings-action-btn">+ Ajouter un compte</button>
+        </div>
 
-      <button id="settings-close">Fermer</button>
+        <div id="tab-skin" class="settings-tab-content hidden">
+          <div class="settings-page-title">Skin</div>
+          <p class="settings-desc" id="skin-tab-empty">Connecte-toi pour voir ton skin.</p>
+          <img id="settings-skin" alt="" style="display:none;">
+        </div>
+
+        <div id="tab-params" class="settings-tab-content hidden">
+          <div class="settings-page-title">Paramètres</div>
+          <div class="setting-row">
+            <label>Mémoire allouée : <strong id="ram-value">4</strong> Go</label>
+            <input type="range" id="ram-slider" min="1" max="16" step="1" value="4">
+          </div>
+          <label class="remember-row"><input type="checkbox" id="close-on-launch"> Fermer le launcher une fois le jeu lancé</label>
+        </div>
+
+        <div id="tab-resourcepacks" class="settings-tab-content hidden">
+          <div class="settings-page-title">Packs de ressources</div>
+          <p class="settings-desc">Place tes fichiers .zip de packs de ressources dans ce dossier pour qu'ils apparaissent en jeu.</p>
+          <button class="settings-action-btn" data-folder="resourcepacks">Ouvrir le dossier</button>
+        </div>
+
+        <div id="tab-shaderpacks" class="settings-tab-content hidden">
+          <div class="settings-page-title">Packs de shaders</div>
+          <p class="settings-desc">Place tes fichiers de shaders (compatibles OptiFine) dans ce dossier.</p>
+          <button class="settings-action-btn" data-folder="shaderpacks">Ouvrir le dossier</button>
+        </div>
+
+        <div id="tab-screenshots" class="settings-tab-content hidden">
+          <div class="settings-page-title">Captures d'écran</div>
+          <p class="settings-desc">Toutes tes captures d'écran prises en jeu (touche F2) sont sauvegardées ici.</p>
+          <button class="settings-action-btn" data-folder="screenshots">Ouvrir le dossier</button>
+        </div>
+
+        <div id="tab-crashreports" class="settings-tab-content hidden">
+          <div class="settings-page-title">Rapports de crash</div>
+          <p class="settings-desc">Si le jeu plante, un rapport détaillé est généré ici — utile pour demander de l'aide.</p>
+          <button class="settings-action-btn" data-folder="crashreports">Ouvrir le dossier</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <div id="content">
-    <div class="icon-symbol">⚓ &nbsp; ⚔</div>
-    <div class="server-name">ODAL</div>
-    <div class="title-divider"><span>✦</span></div>
-    <div class="server-sub">Minecraft 1.20.1 &nbsp;·&nbsp; Forge</div>
-
-    <div id="user-info">
-      <img id="skin-head" alt="">
-      <span>Conquérant : <strong id="username-display"></strong></span>
-    </div>
-
-    <div id="auth-zone">
-      <!-- Connexion -->
-      <div id="login-view" class="auth-view">
-        <input class="login-input" id="input-username" type="text" placeholder="Pseudo Minecraft" maxlength="16" autocomplete="username" spellcheck="false">
-        <div class="password-field">
-          <input class="login-input" id="input-password" type="password" placeholder="Mot de passe" autocomplete="current-password">
-          <button type="button" class="toggle-pw" data-target="input-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-        </div>
-        <label class="remember-row"><input type="checkbox" id="remember-me"> Se souvenir de moi</label>
-        <div class="auth-switch">Pas de compte ? <button onclick="switchAuth('register')">S'inscrire</button></div>
-      </div>
-      <!-- Inscription -->
-      <div id="register-view" class="auth-view hidden">
-        <input class="login-input" id="reg-username" type="text" placeholder="Pseudo Minecraft" maxlength="16" autocomplete="off" spellcheck="false">
-        <input class="login-input" id="reg-email" type="email" placeholder="Adresse e-mail" autocomplete="email" spellcheck="false">
-        <div class="password-field">
-          <input class="login-input" id="reg-password" type="password" placeholder="Mot de passe (6 car. min)" autocomplete="new-password">
-          <button type="button" class="toggle-pw" data-target="reg-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-        </div>
-        <div class="password-field">
-          <input class="login-input" id="reg-confirm" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password">
-          <button type="button" class="toggle-pw" data-target="reg-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-        </div>
-        <div class="auth-switch">Déjà un compte ? <button onclick="switchAuth('login')">Se connecter</button></div>
+    <div id="news-panel">
+      <div class="news-panel-header">Actualités d'Odal</div>
+      <div id="news-list">
+        <div class="news-empty">Chargement...</div>
       </div>
     </div>
 
-    <button id="btn-join">Rejoindre Odal</button>
+    <div id="main-panel">
+      <div class="icon-symbol">⚓ &nbsp; ⚔</div>
+      <div class="server-name">ODAL</div>
+      <div class="title-divider"><span>✦</span></div>
+      <div class="server-sub">Minecraft 1.20.1 &nbsp;·&nbsp; Forge</div>
 
-    <div id="progress-zone">
-      <div id="progress-bar-bg"><div id="progress-bar"></div></div>
-      <div id="status-text">En attente...</div>
+      <div id="server-status">
+        <span id="server-status-dot"></span>
+        <span id="server-status-text">Connexion...</span>
+      </div>
+
+      <div id="user-info">
+        <img id="skin-head" alt="">
+        <span>Conquérant : <strong id="username-display"></strong></span>
+      </div>
+
+      <!-- Selection d'un compte enregistre : reste visible connecte ou non -->
+      <div id="account-picker" class="hidden">
+        <div id="account-picker-list" class="account-list"></div>
+        <div class="auth-switch" id="btn-show-manual"><button onclick="openAddAccountForm()">+ Utiliser un autre compte</button></div>
+      </div>
+
+      <div id="auth-zone">
+        <!-- Connexion -->
+        <div id="login-view" class="auth-view hidden">
+          <input class="login-input" id="input-username" type="text" placeholder="Pseudo Minecraft" maxlength="16" autocomplete="username" spellcheck="false">
+          <div class="password-field">
+            <input class="login-input" id="input-password" type="password" placeholder="Mot de passe" autocomplete="current-password">
+            <button type="button" class="toggle-pw" data-target="input-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <label class="remember-row"><input type="checkbox" id="remember-me"> Se souvenir de moi</label>
+          <div class="auth-switch">Pas de compte ? <button onclick="switchAuth('register')">S'inscrire</button></div>
+        </div>
+        <!-- Inscription -->
+        <div id="register-view" class="auth-view hidden">
+          <input class="login-input" id="reg-username" type="text" placeholder="Pseudo Minecraft" maxlength="16" autocomplete="off" spellcheck="false">
+          <input class="login-input" id="reg-email" type="email" placeholder="Adresse e-mail" autocomplete="email" spellcheck="false">
+          <div class="password-field">
+            <input class="login-input" id="reg-password" type="password" placeholder="Mot de passe (6 car. min)" autocomplete="new-password">
+            <button type="button" class="toggle-pw" data-target="reg-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="password-field">
+            <input class="login-input" id="reg-confirm" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password">
+            <button type="button" class="toggle-pw" data-target="reg-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="auth-switch">Déjà un compte ? <button onclick="switchAuth('login')">Se connecter</button></div>
+        </div>
+      </div>
+
+      <button id="btn-join">Rejoindre Odal</button>
+
+      <div id="progress-zone">
+        <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+        <div id="status-text">En attente...</div>
+      </div>
     </div>
   </div>
 

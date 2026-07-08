@@ -24,6 +24,7 @@ cp.spawn = function(cmd, args, opts) {
 
 const { Client, Authenticator } = require('minecraft-launcher-core');
 const { execFile } = require('child_process');
+const { status: mcStatus } = require('minecraft-server-util');
 
 const SERVER_IP = 'odal.minesr.com';
 const SERVER_PORT = 25565;
@@ -31,6 +32,7 @@ const FORGE_VERSION = '1.20.1-47.3.0';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
 const CURRENT_VERSION = app.getVersion();
+const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 
 let mainWindow;
 let currentUser = null;
@@ -123,8 +125,8 @@ async function checkForUpdates() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 550,
+    width: 1150,
+    height: 650,
     frame: false,
     resizable: false,
     webPreferences: {
@@ -146,32 +148,122 @@ ipcMain.on('open-url', (e, url) => shell.openExternal(url));
 
 ipcMain.handle('get-site-api', () => SITE_API);
 
-const CREDS_PATH = path.join(app.getPath('userData'), 'saved-account.enc');
+ipcMain.handle('logout', () => {
+  currentUser = null;
+  return { success: true };
+});
+
+const GAME_FOLDERS = {
+  resourcepacks: 'resourcepacks',
+  shaderpacks: 'shaderpacks',
+  screenshots: 'screenshots',
+  crashreports: 'crash-reports'
+};
+
+ipcMain.handle('open-game-folder', (event, key) => {
+  const sub = GAME_FOLDERS[key];
+  if (!sub) return { success: false };
+  const dir = path.join(GAME_DIR, sub);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  shell.openPath(dir);
+  return { success: true };
+});
+
+ipcMain.handle('get-server-status', async () => {
+  try {
+    const result = await mcStatus(SERVER_IP, SERVER_PORT, { timeout: 5000 });
+    return { online: true, players: result.players.online, max: result.players.max };
+  } catch (err) {
+    return { online: false };
+  }
+});
+
+ipcMain.handle('get-news', async () => {
+  try {
+    const data = await httpsGet(`https://${SITE_API}/news.json`);
+    const news = JSON.parse(data);
+    return Array.isArray(news) ? news : [];
+  } catch (err) {
+    return [];
+  }
+});
+
+// Stocke plusieurs comptes (chiffres) pour permettre de switcher sans retaper le mot de passe.
+const ACCOUNTS_PATH = path.join(app.getPath('userData'), 'accounts.enc');
+const OLD_CREDS_PATH = path.join(app.getPath('userData'), 'saved-account.enc');
+const LAST_ACCOUNT_PATH = path.join(app.getPath('userData'), 'last-account.json');
+
+function loadAccounts() {
+  try {
+    if (fs.existsSync(ACCOUNTS_PATH) && safeStorage.isEncryptionAvailable()) {
+      const encrypted = fs.readFileSync(ACCOUNTS_PATH);
+      return JSON.parse(safeStorage.decryptString(encrypted));
+    }
+    // Migration depuis l'ancien systeme mono-compte
+    if (fs.existsSync(OLD_CREDS_PATH) && safeStorage.isEncryptionAvailable()) {
+      const encrypted = fs.readFileSync(OLD_CREDS_PATH);
+      const old = JSON.parse(safeStorage.decryptString(encrypted));
+      const migrated = [old];
+      saveAccounts(migrated);
+      fs.unlinkSync(OLD_CREDS_PATH);
+      return migrated;
+    }
+  } catch (err) {}
+  return [];
+}
+
+function saveAccounts(accounts) {
+  if (!safeStorage.isEncryptionAvailable()) return false;
+  fs.writeFileSync(ACCOUNTS_PATH, safeStorage.encryptString(JSON.stringify(accounts)));
+  return true;
+}
+
+function setLastAccount(username) {
+  try { fs.writeFileSync(LAST_ACCOUNT_PATH, JSON.stringify({ username })); } catch (err) {}
+}
+
+ipcMain.handle('get-accounts', () => loadAccounts().map((a) => ({ username: a.username })));
+
+ipcMain.handle('get-last-account', () => {
+  try { return JSON.parse(fs.readFileSync(LAST_ACCOUNT_PATH, 'utf8')); } catch (err) { return null; }
+});
 
 ipcMain.handle('save-credentials', (event, username, password) => {
   try {
-    if (!safeStorage.isEncryptionAvailable()) return { success: false };
-    const encrypted = safeStorage.encryptString(JSON.stringify({ username, password }));
-    fs.writeFileSync(CREDS_PATH, encrypted);
+    const accounts = loadAccounts().filter((a) => a.username.toLowerCase() !== username.toLowerCase());
+    accounts.push({ username, password });
+    saveAccounts(accounts);
+    setLastAccount(username);
     return { success: true };
   } catch (err) {
     return { success: false };
   }
 });
 
-ipcMain.handle('load-credentials', () => {
+ipcMain.handle('remove-account', (event, username) => {
   try {
-    if (!fs.existsSync(CREDS_PATH) || !safeStorage.isEncryptionAvailable()) return null;
-    const encrypted = fs.readFileSync(CREDS_PATH);
-    return JSON.parse(safeStorage.decryptString(encrypted));
+    const accounts = loadAccounts().filter((a) => a.username.toLowerCase() !== username.toLowerCase());
+    saveAccounts(accounts);
+    const last = fs.existsSync(LAST_ACCOUNT_PATH) ? JSON.parse(fs.readFileSync(LAST_ACCOUNT_PATH, 'utf8')) : null;
+    if (last && last.username.toLowerCase() === username.toLowerCase()) fs.unlinkSync(LAST_ACCOUNT_PATH);
+    return { success: true };
   } catch (err) {
-    return null;
+    return { success: false };
   }
 });
 
-ipcMain.handle('clear-credentials', () => {
-  try { if (fs.existsSync(CREDS_PATH)) fs.unlinkSync(CREDS_PATH); } catch (err) {}
-  return { success: true };
+ipcMain.handle('login-with-saved-account', async (event, username) => {
+  const account = loadAccounts().find((a) => a.username.toLowerCase() === username.toLowerCase());
+  if (!account) return { success: false, error: 'Compte introuvable' };
+  try {
+    const result = await httpsPost(`https://${SITE_API}/api/launcher_auth.php`, { username: account.username, password: account.password });
+    if (result.error) return { success: false, error: result.error };
+    currentUser = { username: result.username };
+    setLastAccount(result.username);
+    return { success: true, username: result.username };
+  } catch (err) {
+    return { success: false, error: 'Impossible de contacter le serveur Odal' };
+  }
 });
 
 const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
@@ -231,7 +323,6 @@ ipcMain.handle('register-site', async (event, mc_username, email, password) => {
 });
 
 ipcMain.handle('launch', async (event) => {
-  const GAME_DIR = path.join(app.getPath('appData'), '.odal');
   const modsDir = path.join(GAME_DIR, 'mods');
   const FORGE_JAR = path.join(app.getPath('userData'), 'forge-installer.jar');
   const forgeVersionDir = path.join(GAME_DIR, 'versions', `1.20.1-forge-${FORGE_VERSION}`);

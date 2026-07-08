@@ -17,19 +17,117 @@ const authZone    = document.getElementById('auth-zone');
 
 let isLoggedIn  = false;
 let currentView = 'login'; // 'login' | 'register'
+let showAddAccountForm = true; // affiche le formulaire manuel (connexion/inscription)
 let siteApi = 'odalmc.fr';
+let savedAccounts = [];
 
 function setSkinHead(username) {
   skinHead.src = `https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(username)}&size=64&t=${Date.now()}`;
 }
 
+function onLoginSuccess(username) {
+  usernameDisplay.textContent = username;
+  setSkinHead(username);
+  isLoggedIn = true;
+  showAddAccountForm = false;
+  btnJoin.disabled = false;
+  refreshAccountsUI();
+  updateAuthView();
+}
+
+function renderAccountList(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!savedAccounts.length) { el.innerHTML = ''; return; }
+  el.innerHTML = savedAccounts.map((a) => `
+    <div class="account-row${isLoggedIn && a.username === usernameDisplay.textContent ? ' active' : ''}" data-username="${escapeHtml(a.username)}">
+      <img class="account-row-avatar" src="https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(a.username)}&size=32" alt="">
+      <span class="account-row-name">${escapeHtml(a.username)}</span>
+      <button class="account-row-remove" data-username="${escapeHtml(a.username)}" title="Oublier ce compte">✕</button>
+    </div>
+  `).join('');
+  el.querySelectorAll('.account-row').forEach((row) => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.account-row-remove')) return;
+      loginWithAccountAndLaunch(row.dataset.username);
+    });
+  });
+  el.querySelectorAll('.account-row-remove').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await window.launcher.removeAccount(btn.dataset.username);
+      await refreshAccountsUI();
+    });
+  });
+}
+
+async function refreshAccountsUI() {
+  savedAccounts = await window.launcher.getAccounts();
+  renderAccountList('account-picker-list');
+  renderAccountList('settings-account-list');
+  updateAuthView();
+}
+
+async function loginWithAccountAndLaunch(username) {
+  btnJoin.disabled = true;
+  setStatus('Connexion...');
+  setProgress(0);
+  const result = await window.launcher.loginWithSavedAccount(username);
+  if (!result.success) {
+    setStatus(result.error || 'Erreur de connexion');
+    btnJoin.disabled = false;
+    return;
+  }
+  onLoginSuccess(result.username);
+  setStatus('Démarrage...');
+  await window.launcher.launch();
+}
+
+function updateAuthView() {
+  const hasAccounts = savedAccounts.length > 0;
+  const showForm = !isLoggedIn || showAddAccountForm;
+  const showLogin = showForm && currentView === 'login';
+  const showRegister = showForm && currentView === 'register';
+
+  document.getElementById('account-picker').classList.toggle('hidden', !hasAccounts);
+  document.getElementById('btn-show-manual').classList.toggle('hidden', !hasAccounts || showForm);
+  document.querySelector('#btn-show-manual button').textContent = isLoggedIn ? '+ Ajouter un compte' : '+ Utiliser un autre compte';
+
+  authZone.style.display = showForm ? 'flex' : 'none';
+  document.getElementById('login-view').classList.toggle('hidden', !showLogin);
+  document.getElementById('register-view').classList.toggle('hidden', !showRegister);
+
+  userInfo.style.display = (isLoggedIn && !showAddAccountForm) ? 'flex' : 'none';
+
+  btnJoin.textContent = showRegister ? 'Créer mon compte' : 'Rejoindre Odal';
+  setStatus('En attente...');
+}
+
+function openAddAccountForm() {
+  showAddAccountForm = true;
+  currentView = 'login';
+  settingsOverlay.classList.add('hidden');
+  updateAuthView();
+}
+window.openAddAccountForm = openAddAccountForm;
+
 (async () => {
   siteApi = await window.launcher.getSiteApi();
-  const saved = await window.launcher.loadCredentials();
-  if (saved) {
-    document.getElementById('input-username').value = saved.username;
-    document.getElementById('input-password').value = saved.password;
-    rememberMe.checked = true;
+  await refreshAccountsUI();
+
+  showAddAccountForm = savedAccounts.length === 0;
+  currentView = 'login';
+  updateAuthView();
+
+  const last = await window.launcher.getLastAccount();
+  if (last && savedAccounts.some((a) => a.username === last.username)) {
+    setStatus('Connexion automatique...');
+    const result = await window.launcher.loginWithSavedAccount(last.username);
+    if (result.success) {
+      onLoginSuccess(result.username);
+    } else {
+      updateAuthView();
+    }
   }
 
   const maxRam = await window.launcher.getSystemMemoryGB();
@@ -40,10 +138,44 @@ function setSkinHead(username) {
   closeOnLaunch.checked = !!settings.closeOnLaunch;
 })();
 
-btnSettings.addEventListener('click', () => settingsOverlay.classList.remove('hidden'));
+function openSettings(tab) {
+  settingsOverlay.classList.remove('hidden');
+  document.querySelectorAll('.settings-tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.settings-tab-content').forEach((c) => c.classList.toggle('hidden', c.id !== `tab-${tab}`));
+  if (tab === 'account') {
+    document.getElementById('settings-username').textContent = usernameDisplay.textContent || 'Non connecté';
+  }
+  if (tab === 'skin') {
+    const skinImg = document.getElementById('settings-skin');
+    const skinEmpty = document.getElementById('skin-tab-empty');
+    if (usernameDisplay.textContent) {
+      skinEmpty.style.display = 'none';
+      skinImg.style.display = '';
+      skinImg.src = `https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(usernameDisplay.textContent)}&size=128&t=${Date.now()}`;
+    } else {
+      skinEmpty.style.display = '';
+      skinImg.style.display = 'none';
+    }
+  }
+}
+
+document.querySelectorAll('.settings-tab').forEach((tabBtn) => {
+  tabBtn.addEventListener('click', () => openSettings(tabBtn.dataset.tab));
+});
+
+btnSettings.addEventListener('click', () => openSettings('params'));
+userInfo.addEventListener('click', () => openSettings('account'));
 settingsClose.addEventListener('click', () => settingsOverlay.classList.add('hidden'));
 settingsOverlay.addEventListener('click', (e) => {
   if (e.target === settingsOverlay) settingsOverlay.classList.add('hidden');
+});
+
+document.querySelectorAll('[data-folder]').forEach((btn) => {
+  btn.addEventListener('click', () => window.launcher.openGameFolder(btn.dataset.folder));
+});
+
+document.getElementById('btn-add-account').addEventListener('click', () => {
+  openAddAccountForm();
 });
 
 ramSlider.addEventListener('input', () => {
@@ -55,6 +187,44 @@ ramSlider.addEventListener('change', () => {
 closeOnLaunch.addEventListener('change', () => {
   window.launcher.saveSettings({ closeOnLaunch: closeOnLaunch.checked });
 });
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+async function loadNews() {
+  const newsList = document.getElementById('news-list');
+  const news = await window.launcher.getNews();
+  if (!news.length) {
+    newsList.innerHTML = '<div class="news-empty">Aucune actualité pour le moment</div>';
+    return;
+  }
+  newsList.innerHTML = news.map((n) => `
+    <div class="news-card">
+      <div class="news-date">${escapeHtml(n.date)}</div>
+      <div class="news-title">${escapeHtml(n.title)}</div>
+      <div class="news-excerpt">${escapeHtml(n.excerpt)}</div>
+    </div>
+  `).join('');
+}
+loadNews();
+
+async function refreshServerStatus() {
+  const dot  = document.getElementById('server-status-dot');
+  const text = document.getElementById('server-status-text');
+  const status = await window.launcher.getServerStatus();
+  if (status.online) {
+    dot.className = 'online';
+    text.textContent = `${status.players} / ${status.max} joueurs en ligne`;
+  } else {
+    dot.className = 'offline';
+    text.textContent = 'Serveur hors ligne';
+  }
+}
+refreshServerStatus();
+setInterval(refreshServerStatus, 30000);
 
 const EYE_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.4 18.4 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
@@ -71,10 +241,8 @@ document.querySelectorAll('.toggle-pw').forEach((btn) => {
 
 function switchAuth(view) {
   currentView = view;
-  document.getElementById('login-view').classList.toggle('hidden', view !== 'login');
-  document.getElementById('register-view').classList.toggle('hidden', view !== 'register');
-  btnJoin.textContent = view === 'register' ? '⚓ Créer mon compte' : '⚓ Rejoindre Odal';
-  setStatus('En attente...');
+  showAddAccountForm = true;
+  updateAuthView();
 }
 window.switchAuth = switchAuth;
 
@@ -82,7 +250,7 @@ btnMin.addEventListener('click', () => window.launcher.minimize());
 btnClose.addEventListener('click', () => window.launcher.close());
 
 btnJoin.addEventListener('click', async () => {
-  if (isLoggedIn) {
+  if (isLoggedIn && !showAddAccountForm) {
     btnJoin.disabled = true;
     setStatus('Démarrage...');
     await window.launcher.launch();
@@ -110,12 +278,8 @@ btnJoin.addEventListener('click', async () => {
       return;
     }
 
-    usernameDisplay.textContent = result.username;
-    setSkinHead(result.username);
-    userInfo.style.display = 'flex';
-    authZone.style.display = 'none';
-    isLoggedIn = true;
-    btnJoin.textContent = '⚓ Rejoindre Odal';
+    await window.launcher.saveCredentials(mc_username, password);
+    onLoginSuccess(result.username);
 
   } else {
     const username = document.getElementById('input-username').value.trim();
@@ -136,15 +300,9 @@ btnJoin.addEventListener('click', async () => {
 
     if (rememberMe.checked) {
       await window.launcher.saveCredentials(username, password);
-    } else {
-      await window.launcher.clearCredentials();
     }
 
-    usernameDisplay.textContent = result.username;
-    setSkinHead(result.username);
-    userInfo.style.display = 'flex';
-    authZone.style.display = 'none';
-    isLoggedIn = true;
+    onLoginSuccess(result.username);
   }
 
   btnJoin.disabled = true;
