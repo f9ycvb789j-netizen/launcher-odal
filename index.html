@@ -313,6 +313,25 @@
     }
     .login-input::placeholder { color: rgba(201,162,39,0.25); }
     .login-input:focus { border-color: rgba(201,162,39,0.6); background: rgba(201,162,39,0.08); }
+
+    .password-field { position: relative; width: 100%; }
+    .password-field .login-input { padding-right: 38px; }
+    .toggle-pw {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      color: rgba(232,213,176,0.55);
+      transition: color 0.2s;
+    }
+    .toggle-pw svg { display: block; width: 17px; height: 17px; }
+    .toggle-pw:hover { color: #e0c050; }
+    .toggle-pw.active { color: #c9a227; }
     .auth-switch {
       font-size: 11px;
       color: rgba(201,162,39,0.35);
@@ -357,6 +376,62 @@
       border: 1px solid rgba(201,162,39,0.4);
       border-radius: 3px;
     }
+
+    #settings-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(2,4,8,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      -webkit-app-region: no-drag;
+    }
+    #settings-overlay.hidden { display: none; }
+    #settings-panel {
+      width: 300px;
+      background: linear-gradient(180deg, #0a1220 0%, #060a12 100%);
+      border: 1px solid rgba(201,162,39,0.35);
+      border-radius: 6px;
+      padding: 22px 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .settings-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      letter-spacing: 2px;
+      color: #c9a227;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+    .setting-row { display: flex; flex-direction: column; gap: 8px; }
+    .setting-row label {
+      font-size: 12px;
+      color: rgba(232,213,176,0.7);
+      letter-spacing: 0.5px;
+    }
+    .setting-row input[type="range"] {
+      width: 100%;
+      accent-color: #c9a227;
+    }
+    #settings-close {
+      background: rgba(201,162,39,0.12);
+      border: 1px solid rgba(201,162,39,0.4);
+      color: #c9a227;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 9px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #settings-close:hover { background: rgba(201,162,39,0.22); }
   </style>
 </head>
 <body>
@@ -379,8 +454,26 @@
   <div id="titlebar">
     <span>Odal · Launcher</span>
     <div class="win-btns">
+      <button class="win-btn" id="btn-settings" title="Paramètres">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+      </button>
       <button class="win-btn" id="btn-min">—</button>
       <button class="win-btn" id="btn-close">✕</button>
+    </div>
+  </div>
+
+  <div id="settings-overlay" class="hidden">
+    <div id="settings-panel">
+      <div class="settings-title">Paramètres</div>
+
+      <div class="setting-row">
+        <label>Mémoire allouée : <strong id="ram-value">4</strong> Go</label>
+        <input type="range" id="ram-slider" min="1" max="16" step="1" value="4">
+      </div>
+
+      <label class="remember-row"><input type="checkbox" id="close-on-launch"> Fermer le launcher une fois le jeu lancé</label>
+
+      <button id="settings-close">Fermer</button>
     </div>
   </div>
 
@@ -399,7 +492,10 @@
       <!-- Connexion -->
       <div id="login-view" class="auth-view">
         <input class="login-input" id="input-username" type="text" placeholder="Pseudo Minecraft" maxlength="16" autocomplete="username" spellcheck="false">
-        <input class="login-input" id="input-password" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <div class="password-field">
+          <input class="login-input" id="input-password" type="password" placeholder="Mot de passe" autocomplete="current-password">
+          <button type="button" class="toggle-pw" data-target="input-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
         <label class="remember-row"><input type="checkbox" id="remember-me"> Se souvenir de moi</label>
         <div class="auth-switch">Pas de compte ? <button onclick="switchAuth('register')">S'inscrire</button></div>
       </div>
@@ -407,8 +503,14 @@
       <div id="register-view" class="auth-view hidden">
         <input class="login-input" id="reg-username" type="text" placeholder="Pseudo Minecraft" maxlength="16" autocomplete="off" spellcheck="false">
         <input class="login-input" id="reg-email" type="email" placeholder="Adresse e-mail" autocomplete="email" spellcheck="false">
-        <input class="login-input" id="reg-password" type="password" placeholder="Mot de passe (6 car. min)" autocomplete="new-password">
-        <input class="login-input" id="reg-confirm" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password">
+        <div class="password-field">
+          <input class="login-input" id="reg-password" type="password" placeholder="Mot de passe (6 car. min)" autocomplete="new-password">
+          <button type="button" class="toggle-pw" data-target="reg-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="password-field">
+          <input class="login-input" id="reg-confirm" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password">
+          <button type="button" class="toggle-pw" data-target="reg-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
         <div class="auth-switch">Déjà un compte ? <button onclick="switchAuth('login')">Se connecter</button></div>
       </div>
     </div>

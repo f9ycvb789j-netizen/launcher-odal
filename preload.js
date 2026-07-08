@@ -11,5 +11,8 @@ contextBridge.exposeInMainWorld('launcher', {
   getSiteApi: () => ipcRenderer.invoke('get-site-api'),
   saveCredentials: (username, password) => ipcRenderer.invoke('save-credentials', username, password),
   loadCredentials: () => ipcRenderer.invoke('load-credentials'),
-  clearCredentials: () => ipcRenderer.invoke('clear-credentials')
+  clearCredentials: () => ipcRenderer.invoke('clear-credentials'),
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
+  getSystemMemoryGB: () => ipcRenderer.invoke('get-system-memory-gb')
 });

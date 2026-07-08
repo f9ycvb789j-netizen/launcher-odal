@@ -174,6 +174,34 @@ ipcMain.handle('clear-credentials', () => {
   return { success: true };
 });
 
+const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
+const DEFAULT_SETTINGS = { ramGB: 4, closeOnLaunch: false };
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf8'));
+    return Object.assign({}, DEFAULT_SETTINGS, saved);
+  } catch (err) {
+    return Object.assign({}, DEFAULT_SETTINGS);
+  }
+}
+
+ipcMain.handle('get-settings', () => loadSettings());
+
+ipcMain.handle('save-settings', (event, settings) => {
+  try {
+    const merged = Object.assign({}, loadSettings(), settings);
+    fs.writeFileSync(SETTINGS_PATH, JSON.stringify(merged));
+    return { success: true };
+  } catch (err) {
+    return { success: false };
+  }
+});
+
+ipcMain.handle('get-system-memory-gb', () => {
+  return Math.max(2, Math.floor(require('os').totalmem() / (1024 ** 3)));
+});
+
 // launcher_auth.php verifie les identifiants ET cree la session dans odal_sessions
 // que le serveur Minecraft controle via validate_session.php avant d'accepter la connexion.
 ipcMain.handle('login-site', async (event, username, password) => {
@@ -256,6 +284,7 @@ ipcMain.handle('launch', async (event) => {
   });
 
   const auth = currentUser ? Authenticator.getAuth(currentUser.username) : Authenticator.getAuth('Joueur');
+  const settings = loadSettings();
 
   await launcher.launch({
     authorization: auth,
@@ -266,11 +295,13 @@ ipcMain.handle('launch', async (event) => {
     },
     javaPath,
     forge: forgeInstalled ? undefined : FORGE_JAR,
-    memory: { max: '4G', min: '2G' }
+    memory: { max: `${settings.ramGB}G`, min: '1G' }
   });
 
   send(event, 'progress', 100);
   send(event, 'status', 'Jeu lancé !');
+
+  if (settings.closeOnLaunch) app.quit();
 });
 
 function findJavaw(gameDir) {
