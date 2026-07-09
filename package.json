@@ -1,6 +1,6 @@
 {
   "name": "launcher-odal",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Launcher Serveur Odal",
   "main": "main.js",
   "scripts": {
@@ -17,6 +17,7 @@
       "preload.js",
       "index.html",
       "renderer.js",
+      "skinview3d.bundle.js",
       "mods-manifest.json",
       "mods-pack/**",
       "node_modules/**"

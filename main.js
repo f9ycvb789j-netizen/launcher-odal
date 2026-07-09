@@ -31,6 +31,7 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.3.0';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.6 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 
@@ -260,7 +261,7 @@ ipcMain.handle('login-with-saved-account', async (event, username) => {
     if (result.error) return { success: false, error: result.error };
     currentUser = { username: result.username };
     setLastAccount(result.username);
-    return { success: true, username: result.username };
+    return { success: true, username: result.username, grade: result.grade };
   } catch (err) {
     return { success: false, error: 'Impossible de contacter le serveur Odal' };
   }
@@ -301,7 +302,7 @@ ipcMain.handle('login-site', async (event, username, password) => {
     const result = await httpsPost(`https://${SITE_API}/api/launcher_auth.php`, { username, password });
     if (result.error) return { success: false, error: result.error };
     currentUser = { username: result.username };
-    return { success: true, username: result.username };
+    return { success: true, username: result.username, grade: result.grade };
   } catch (err) {
     return { success: false, error: 'Impossible de contacter le serveur Odal' };
   }
@@ -316,7 +317,7 @@ ipcMain.handle('register-site', async (event, mc_username, email, password) => {
     if (session.error) return { success: false, error: 'Compte créé, mais session de jeu impossible : ' + session.error };
 
     currentUser = { username: result.mc_username };
-    return { success: true, username: result.mc_username };
+    return { success: true, username: result.mc_username, grade: session.grade };
   } catch (err) {
     return { success: false, error: 'Impossible de contacter le serveur Odal' };
   }
@@ -553,7 +554,7 @@ function download(url, dest, onProgress) {
   return new Promise((resolve, reject) => {
     const follow = (u, redirectsLeft) => {
       const mod = u.startsWith('https') ? https : require('http');
-      const req = mod.get(u, { timeout: 30000 }, (res) => {
+      const req = mod.get(u, { timeout: 30000, headers: { 'User-Agent': USER_AGENT } }, (res) => {
         if ([301, 302, 303, 307, 308].includes(res.statusCode)) {
           res.resume();
           if (redirectsLeft <= 0) return reject(new Error('Trop de redirections'));
@@ -589,7 +590,7 @@ function send(event, channel, data) {
 
 function httpsGetOnce(url, timeoutMs) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, { timeout: timeoutMs }, (res) => {
+    const req = https.get(url, { timeout: timeoutMs, headers: { 'User-Agent': USER_AGENT } }, (res) => {
       let raw = '';
       res.on('data', c => raw += c);
       res.on('end', () => resolve(raw));
@@ -617,7 +618,7 @@ function httpsPostOnce(url, data, timeoutMs) {
       path: u.pathname,
       method: 'POST',
       timeout: timeoutMs,
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), 'User-Agent': USER_AGENT }
     }, (res) => {
       let raw = '';
       res.on('data', c => raw += c);
@@ -633,7 +634,15 @@ function httpsPostOnce(url, data, timeoutMs) {
   });
 }
 
-async function httpsPost(url, data, retries = 1, timeoutMs = 10000) {
+// TigerProtect (pare-feu o2switch) bloque toute 2e requete arrivant trop vite apres la
+// premiere : on impose donc un espacement minimum entre deux POST, quel que soit l'appelant.
+let lastPostAt = 0;
+const MIN_POST_INTERVAL_MS = 2000;
+
+async function httpsPost(url, data, retries = 2, timeoutMs = 10000) {
+  const wait = lastPostAt + MIN_POST_INTERVAL_MS - Date.now();
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+  lastPostAt = Date.now();
   try {
     return await httpsPostOnce(url, data, timeoutMs);
   } catch (err) {

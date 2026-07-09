@@ -9,7 +9,6 @@ const closeOnLaunch = document.getElementById('close-on-launch');
 const btnJoin   = document.getElementById('btn-join');
 const userInfo  = document.getElementById('user-info');
 const usernameDisplay = document.getElementById('username-display');
-const skinHead    = document.getElementById('skin-head');
 const rememberMe  = document.getElementById('remember-me');
 const progressBar = document.getElementById('progress-bar');
 const statusText  = document.getElementById('status-text');
@@ -20,19 +19,41 @@ let currentView = 'login'; // 'login' | 'register'
 let showAddAccountForm = true; // affiche le formulaire manuel (connexion/inscription)
 let siteApi = 'odalmc.fr';
 let savedAccounts = [];
+let skinViewer = null;
 
-function setSkinHead(username) {
-  skinHead.src = `https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(username)}&size=64&t=${Date.now()}`;
+function initSkinViewer() {
+  const canvas = document.getElementById('skin-viewer-3d');
+  skinViewer = new skinview3d.SkinViewer({ canvas, width: 90, height: 130 });
+  skinViewer.autoRotate = true;
+  skinViewer.autoRotateSpeed = 0.6;
+  skinViewer.zoom = 0.9;
+  skinViewer.controls.enableZoom = false;
 }
 
-function onLoginSuccess(username) {
+function setSkinHead(username) {
+  if (!skinViewer) return;
+  skinViewer.loadSkin(`https://${siteApi}/api/skin_full.php?user=${encodeURIComponent(username)}&t=${Date.now()}`).catch(() => {});
+}
+
+function onLoginSuccess(username, grade) {
   usernameDisplay.textContent = username;
+  document.getElementById('grade-display').textContent = grade || 'Membre';
   setSkinHead(username);
   isLoggedIn = true;
   showAddAccountForm = false;
   btnJoin.disabled = false;
   refreshAccountsUI();
   updateAuthView();
+}
+
+function closeAccountDropdown() {
+  document.getElementById('account-dropdown-menu').classList.add('hidden');
+  document.getElementById('account-dropdown-trigger').classList.remove('open');
+}
+
+function updateAccountDropdownLabel() {
+  const label = document.getElementById('account-dropdown-label');
+  label.textContent = (isLoggedIn && usernameDisplay.textContent) ? usernameDisplay.textContent : 'Choisir un compte';
 }
 
 function renderAccountList(containerId) {
@@ -49,7 +70,7 @@ function renderAccountList(containerId) {
   el.querySelectorAll('.account-row').forEach((row) => {
     row.addEventListener('click', (e) => {
       if (e.target.closest('.account-row-remove')) return;
-      loginWithAccountAndLaunch(row.dataset.username);
+      loginWithAccount(row.dataset.username);
     });
   });
   el.querySelectorAll('.account-row-remove').forEach((btn) => {
@@ -65,22 +86,31 @@ async function refreshAccountsUI() {
   savedAccounts = await window.launcher.getAccounts();
   renderAccountList('account-picker-list');
   renderAccountList('settings-account-list');
+  updateAccountDropdownLabel();
   updateAuthView();
 }
 
-async function loginWithAccountAndLaunch(username) {
+let accountSwitchBusy = false;
+
+async function loginWithAccount(username) {
+  if (accountSwitchBusy) return;
+  accountSwitchBusy = true;
+  closeAccountDropdown();
   btnJoin.disabled = true;
   setStatus('Connexion...');
   setProgress(0);
-  const result = await window.launcher.loginWithSavedAccount(username);
-  if (!result.success) {
-    setStatus(result.error || 'Erreur de connexion');
+  try {
+    const result = await window.launcher.loginWithSavedAccount(username);
+    if (!result.success) {
+      setStatus(result.error || 'Erreur de connexion');
+      return;
+    }
+    onLoginSuccess(result.username, result.grade);
+    setStatus('En attente...');
+  } finally {
     btnJoin.disabled = false;
-    return;
+    accountSwitchBusy = false;
   }
-  onLoginSuccess(result.username);
-  setStatus('Démarrage...');
-  await window.launcher.launch();
 }
 
 function updateAuthView() {
@@ -104,6 +134,7 @@ function updateAuthView() {
 }
 
 function openAddAccountForm() {
+  closeAccountDropdown();
   showAddAccountForm = true;
   currentView = 'login';
   settingsOverlay.classList.add('hidden');
@@ -111,7 +142,19 @@ function openAddAccountForm() {
 }
 window.openAddAccountForm = openAddAccountForm;
 
+const accountDropdownTrigger = document.getElementById('account-dropdown-trigger');
+const accountDropdownMenu = document.getElementById('account-dropdown-menu');
+accountDropdownTrigger.addEventListener('click', () => {
+  const isOpen = !accountDropdownMenu.classList.contains('hidden');
+  accountDropdownMenu.classList.toggle('hidden', isOpen);
+  accountDropdownTrigger.classList.toggle('open', !isOpen);
+});
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('account-picker').contains(e.target)) closeAccountDropdown();
+});
+
 (async () => {
+  initSkinViewer();
   siteApi = await window.launcher.getSiteApi();
   await refreshAccountsUI();
 
@@ -124,7 +167,7 @@ window.openAddAccountForm = openAddAccountForm;
     setStatus('Connexion automatique...');
     const result = await window.launcher.loginWithSavedAccount(last.username);
     if (result.success) {
-      onLoginSuccess(result.username);
+      onLoginSuccess(result.username, result.grade);
     } else {
       updateAuthView();
     }
@@ -279,7 +322,7 @@ btnJoin.addEventListener('click', async () => {
     }
 
     await window.launcher.saveCredentials(mc_username, password);
-    onLoginSuccess(result.username);
+    onLoginSuccess(result.username, result.grade);
 
   } else {
     const username = document.getElementById('input-username').value.trim();
@@ -302,7 +345,7 @@ btnJoin.addEventListener('click', async () => {
       await window.launcher.saveCredentials(username, password);
     }
 
-    onLoginSuccess(result.username);
+    onLoginSuccess(result.username, result.grade);
   }
 
   btnJoin.disabled = true;

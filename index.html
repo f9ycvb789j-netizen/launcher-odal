@@ -459,7 +459,40 @@
       cursor: pointer;
     }
 
-    #account-picker { display: flex; flex-direction: column; gap: 10px; width: 280px; }
+    #account-picker { position: relative; width: 280px; }
+    #account-dropdown-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(201,162,39,0.05);
+      border: 1px solid rgba(201,162,39,0.25);
+      border-radius: 3px;
+      color: #e8d5b0;
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    #account-dropdown-trigger:hover { border-color: rgba(201,162,39,0.5); }
+    #account-dropdown-trigger .dropdown-chevron { color: rgba(201,162,39,0.5); flex-shrink: 0; transition: transform 0.2s; }
+    #account-dropdown-trigger.open .dropdown-chevron { transform: rotate(180deg); }
+    #account-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, #0a1220 0%, #060a12 100%);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
     .account-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .account-row {
       display: flex;
@@ -507,21 +540,35 @@
 
     #user-info {
       display: none;
-      align-items: center;
       justify-content: center;
-      gap: 10px;
-      cursor: pointer;
-      padding: 4px 10px;
-      border-radius: 4px;
-      transition: background 0.2s;
     }
-    #user-info:hover { background: rgba(201,162,39,0.08); }
-    #skin-head {
-      width: 32px;
-      height: 32px;
-      image-rendering: pixelated;
-      border: 1px solid rgba(201,162,39,0.4);
-      border-radius: 3px;
+    #skin-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(201,162,39,0.05);
+      border: 1px solid rgba(201,162,39,0.25);
+      border-radius: 6px;
+      padding: 14px 22px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    #skin-card:hover { border-color: rgba(201,162,39,0.5); background: rgba(201,162,39,0.09); }
+    #skin-viewer-3d {
+      width: 90px;
+      height: 130px;
+      cursor: grab;
+      flex-shrink: 0;
+    }
+    #skin-viewer-3d:active { cursor: grabbing; }
+    #skin-card-info { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+    #username-display-line { font-size: 13px; color: rgba(232,213,176,0.6); font-weight: 300; }
+    #grade-display {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: rgba(201,162,39,0.6);
+      text-transform: uppercase;
     }
 
     #settings-overlay {
@@ -766,14 +813,25 @@
       </div>
 
       <div id="user-info">
-        <img id="skin-head" alt="">
-        <span>Conquérant : <strong id="username-display"></strong></span>
+        <div id="skin-card">
+          <canvas id="skin-viewer-3d" width="90" height="130"></canvas>
+          <div id="skin-card-info">
+            <div id="username-display-line">Conquérant : <strong id="username-display"></strong></div>
+            <div id="grade-display"></div>
+          </div>
+        </div>
       </div>
 
-      <!-- Selection d'un compte enregistre : reste visible connecte ou non -->
+      <!-- Selection d'un compte enregistre : menu deroulant, reste visible connecte ou non -->
       <div id="account-picker" class="hidden">
-        <div id="account-picker-list" class="account-list"></div>
-        <div class="auth-switch" id="btn-show-manual"><button onclick="openAddAccountForm()">+ Utiliser un autre compte</button></div>
+        <button type="button" id="account-dropdown-trigger">
+          <span id="account-dropdown-label">Choisir un compte</span>
+          <svg class="dropdown-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="account-dropdown-menu" class="hidden">
+          <div id="account-picker-list" class="account-list"></div>
+          <div class="auth-switch" id="btn-show-manual"><button onclick="openAddAccountForm()">+ Utiliser un autre compte</button></div>
+        </div>
       </div>
 
       <div id="auth-zone">
@@ -814,6 +872,7 @@
 
   <div id="version">v1.0.0</div>
 
+  <script src="skinview3d.bundle.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>
