@@ -520,6 +520,15 @@ function writeServersDat(gameDir) {
 }
 
 async function syncMods(modsDir, event) {
+  // OptiFine retire du modpack : supprime les copies deja installees chez les joueurs.
+  if (fs.existsSync(modsDir)) {
+    for (const file of fs.readdirSync(modsDir)) {
+      if (/^OptiFine.*\.jar$/i.test(file)) {
+        fs.unlinkSync(path.join(modsDir, file));
+      }
+    }
+  }
+
   const manifest = path.join(__dirname, 'mods-manifest.json');
   if (!fs.existsSync(manifest)) return;
 
