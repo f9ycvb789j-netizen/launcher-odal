@@ -69,31 +69,36 @@ async function checkForUpdates() {
       });
 
       const currentExe = process.execPath;
+      const installDir = path.dirname(currentExe);
       const batPath = path.join(os.tmpdir(), 'odal_update.bat');
       const logPath = path.join(os.tmpdir(), 'odal_update_log.txt');
-      // Reessaie la copie (le fichier peut etre encore verrouille juste apres la fermeture).
+      // version.json pointe vers l'installeur NSIS complet, pas un simple exe autonome :
+      // il faut l'executer silencieusement (/S) en ciblant le meme dossier (/D=...) pour
+      // mettre a jour l'installation existante, plutot que de copier le fichier par-dessus
+      // (ce qui lancait l'assistant d'installation lui-meme et pouvait creer une 2e install).
       // Important : pas de goto imbrique dans un bloc if(...) parenthese, c'est instable en batch
       // et peut faire planter le script instantanement sans rien faire.
       const batScript = [
         '@echo off',
         `set LOG="${logPath}"`,
-        `set SRC="${tmpExe}"`,
+        `set INSTALLER="${tmpExe}"`,
         `set DST="${currentExe}"`,
         'echo Debut mise a jour > %LOG% 2>&1',
         'set tries=0',
-        ':copyretry',
+        ':installretry',
         'timeout /t 1 /nobreak > nul',
-        'copy /y %SRC% %DST% >> %LOG% 2>&1',
-        'if not errorlevel 1 goto copied',
+        `%INSTALLER% /S /D=${installDir} >> %LOG% 2>&1`,
+        'if not errorlevel 1 goto installed',
         'set /a tries+=1',
         'echo tentative %tries% echouee >> %LOG%',
-        'if %tries% lss 25 goto copyretry',
+        'if %tries% lss 25 goto installretry',
         'echo ECHEC apres 25 tentatives >> %LOG%',
         'goto end',
-        ':copied',
-        'echo Copie reussie, relance >> %LOG%',
+        ':installed',
+        'echo Installation reussie, relance >> %LOG%',
+        'timeout /t 1 /nobreak > nul',
         'start "" %DST%',
-        'del %SRC% >nul 2>&1',
+        'del %INSTALLER% >nul 2>&1',
         ':end',
         'del "%~f0"',
         ''
