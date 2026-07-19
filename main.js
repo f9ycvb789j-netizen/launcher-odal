@@ -28,7 +28,7 @@ const { status: mcStatus } = require('minecraft-server-util');
 
 const SERVER_IP = 'odal.minesr.com';
 const SERVER_PORT = 25565;
-const FORGE_VERSION = '1.20.1-47.3.0';
+const FORGE_VERSION = '1.20.1-47.2.20';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.6 Chrome/124.0.0.0 Safari/537.36';
@@ -525,12 +525,11 @@ function writeServersDat(gameDir) {
 }
 
 async function syncMods(modsDir, event) {
-  // OptiFine retire du modpack : supprime les copies deja installees chez les joueurs.
   // odalcurrency-1.0.0 remplace par odalcurrency-1.0.1 (contenu modifie, meme mod id) :
   // supprime l'ancien jar pour eviter un conflit de mod en double chez les joueurs deja a jour.
   if (fs.existsSync(modsDir)) {
     for (const file of fs.readdirSync(modsDir)) {
-      if (/^OptiFine.*\.jar$/i.test(file) || file === 'odalcurrency-1.0.0.jar') {
+      if (file === 'odalcurrency-1.0.0.jar') {
         fs.unlinkSync(path.join(modsDir, file));
       }
     }
