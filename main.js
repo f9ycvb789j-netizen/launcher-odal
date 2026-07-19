@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain, shell, safeStorage } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, safeStorage, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const crypto = require('crypto');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -131,10 +132,12 @@ async function checkForUpdates() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1150,
-    height: 650,
+    width: 1366,
+    height: 768,
+    minWidth: 1366,
+    minHeight: 768,
     frame: false,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -173,6 +176,30 @@ ipcMain.handle('open-game-folder', (event, key) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   shell.openPath(dir);
   return { success: true };
+});
+
+ipcMain.handle('pick-skin-file', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Choisir un skin (PNG 64x64)',
+    filters: [{ name: 'Images PNG', extensions: ['png'] }],
+    properties: ['openFile']
+  });
+  if (result.canceled || !result.filePaths.length) return null;
+  return result.filePaths[0];
+});
+
+// Upload direct vers le site : upload_skin.php sauvegarde le PNG (servi ensuite par
+// skin_full.php/skin_head.php), genere la texture signee via MineSkin et met a jour
+// SkinsRestorer, donc le skin est aussi applique en jeu sans etape supplementaire.
+ipcMain.handle('upload-skin', async (event, filePath) => {
+  if (!currentUser) return { success: false, error: 'Non connecté' };
+  try {
+    const result = await httpsPostMultipart(`https://${SITE_API}/api/upload_skin.php`, { user: currentUser.username }, filePath, 'skin');
+    if (result.error) return { success: false, error: result.error };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: 'Impossible de contacter le serveur Odal' };
+  }
 });
 
 ipcMain.handle('get-server-status', async () => {
@@ -662,6 +689,63 @@ async function httpsPost(url, data, retries = 2, timeoutMs = 10000) {
     return await httpsPostOnce(url, data, timeoutMs);
   } catch (err) {
     if (retries > 0) return httpsPost(url, data, retries - 1, timeoutMs);
+    throw err;
+  }
+}
+
+function httpsPostMultipartOnce(url, fields, filePath, fileFieldName, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    let fileBuffer;
+    try {
+      fileBuffer = fs.readFileSync(filePath);
+    } catch (err) {
+      return reject(new Error('Fichier introuvable'));
+    }
+    const boundary = '----OdalLauncher' + crypto.randomBytes(16).toString('hex');
+    const fileName = path.basename(filePath);
+    const parts = [];
+    for (const [key, value] of Object.entries(fields)) {
+      parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="${key}"\r\n\r\n${value}\r\n`));
+    }
+    parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="${fileFieldName}"; filename="${fileName}"\r\nContent-Type: image/png\r\n\r\n`));
+    parts.push(fileBuffer);
+    parts.push(Buffer.from(`\r\n--${boundary}--\r\n`));
+    const body = Buffer.concat(parts);
+
+    const u = new URL(url);
+    const req = https.request({
+      hostname: u.hostname,
+      path: u.pathname,
+      method: 'POST',
+      timeout: timeoutMs,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': body.length,
+        'User-Agent': USER_AGENT
+      }
+    }, (res) => {
+      let raw = '';
+      res.on('data', c => raw += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(raw)); }
+        catch (e) { reject(new Error('Réponse invalide')); }
+      });
+    });
+    req.on('timeout', () => req.destroy(new Error('Le serveur ne répond pas (timeout)')));
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+async function httpsPostMultipart(url, fields, filePath, fileFieldName, retries = 1, timeoutMs = 20000) {
+  const wait = lastPostAt + MIN_POST_INTERVAL_MS - Date.now();
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+  lastPostAt = Date.now();
+  try {
+    return await httpsPostMultipartOnce(url, fields, filePath, fileFieldName, timeoutMs);
+  } catch (err) {
+    if (retries > 0) return httpsPostMultipart(url, fields, filePath, fileFieldName, retries - 1, timeoutMs);
     throw err;
   }
 }

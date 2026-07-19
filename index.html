@@ -10,7 +10,7 @@
     .hidden { display: none !important; }
 
     body {
-      width: 1150px; height: 650px;
+      width: 100vw; height: 100vh;
       font-family: 'Lato', sans-serif;
       background: #040810;
       color: #e8d5b0;
@@ -90,7 +90,7 @@
     }
     #titlebar span {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(201,162,39,0.5);
       letter-spacing: 4px;
       text-transform: uppercase;
@@ -98,11 +98,46 @@
     .win-btn {
       -webkit-app-region: no-drag;
       background: none; border: none; cursor: pointer;
-      color: rgba(201,162,39,0.4); font-size: 13px; padding: 4px 8px;
+      color: rgba(201,162,39,0.4); font-size: 15px; padding: 4px 8px;
       border-radius: 3px; transition: all 0.2s;
     }
     .win-btn:hover { color: #c9a227; background: rgba(201,162,39,0.08); }
     #btn-close:hover { color: #e05a5a; background: rgba(224,90,90,0.1); }
+
+    /* Ligne bouton rejoindre + parametres */
+    #join-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    #join-row #btn-join { margin-top: 0; }
+    #join-spacer { width: 46px; flex-shrink: 0; }
+
+    /* Bouton parametres, bien visible */
+    #btn-settings {
+      -webkit-app-region: no-drag;
+      flex-shrink: 0;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(201,162,39,0.08);
+      border: 1px solid rgba(201,162,39,0.4);
+      border-radius: 8px;
+      color: rgba(201,162,39,0.75);
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      transition: all 0.2s;
+    }
+    #btn-settings:hover {
+      color: #c9a227;
+      background: rgba(201,162,39,0.18);
+      border-color: #c9a227;
+      transform: translateY(-1px);
+    }
     .win-btns { display: flex; gap: 2px; -webkit-app-region: no-drag; }
 
     /* Contenu */
@@ -121,16 +156,6 @@
       flex-direction: column;
       padding: 26px 22px;
       border-right: 1px solid rgba(201,162,39,0.15);
-    }
-    .news-panel-header {
-      font-family: 'Cinzel', serif;
-      font-size: 12px;
-      letter-spacing: 3px;
-      color: rgba(201,162,39,0.6);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(201,162,39,0.2);
     }
     #news-list {
       flex: 1;
@@ -153,31 +178,32 @@
     .news-card:hover { border-color: rgba(201,162,39,0.35); }
     .news-date {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       color: rgba(201,162,39,0.5);
       text-transform: uppercase;
     }
     .news-title {
-      font-size: 16px;
+      font-size: 20px;
       color: #e8d5b0;
       margin: 8px 0 6px;
       font-weight: 600;
     }
     .news-excerpt {
-      font-size: 13.5px;
+      font-size: 17px;
       color: rgba(232,213,176,0.6);
       line-height: 1.5;
       font-weight: 300;
     }
     .news-empty {
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(201,162,39,0.3);
       text-align: center;
       margin-top: 30px;
       font-family: 'Cinzel', serif;
       letter-spacing: 1px;
     }
+
 
     /* Zone principale (jeu) */
     #main-panel {
@@ -196,7 +222,7 @@
       align-items: center;
       gap: 7px;
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       color: rgba(232,213,176,0.6);
       text-transform: uppercase;
@@ -211,18 +237,10 @@
     #server-status-dot.online { background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.7); }
     #server-status-dot.offline { background: #e05a5a; box-shadow: 0 0 8px rgba(224,90,90,0.6); }
 
-    /* Symbole ancre / épée */
-    .icon-symbol {
-      font-size: 28px;
-      color: rgba(201,162,39,0.6);
-      letter-spacing: 16px;
-      margin-bottom: -4px;
-    }
-
     /* Titre ODAL */
     .server-name {
       font-family: 'Cinzel Decorative', serif;
-      font-size: 52px;
+      font-size: 63px;
       font-weight: 700;
       letter-spacing: 10px;
       color: #c9a227;
@@ -240,7 +258,7 @@
       gap: 12px;
       margin: -4px 0 2px;
     }
-    .title-divider span { color: rgba(201,162,39,0.5); font-size: 14px; }
+    .title-divider span { color: rgba(201,162,39,0.5); font-size: 17px; }
     .title-divider::before, .title-divider::after {
       content: '';
       width: 60px; height: 1px;
@@ -250,7 +268,7 @@
 
     .server-sub {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(201,162,39,0.45);
       letter-spacing: 4px;
       text-transform: uppercase;
@@ -259,7 +277,7 @@
 
     /* Info utilisateur */
     #user-info {
-      font-size: 13px;
+      font-size: 15px;
       color: rgba(232,213,176,0.6);
       letter-spacing: 1px;
       display: none;
@@ -276,7 +294,7 @@
       cursor: pointer;
       border-radius: 3px;
       font-family: 'Cinzel', serif;
-      font-size: 14px;
+      font-size: 17px;
       font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
@@ -288,11 +306,6 @@
         0 0 20px rgba(201,162,39,0.3),
         0 4px 12px rgba(0,0,0,0.6),
         inset 0 1px 0 rgba(255,220,100,0.4);
-    }
-    #btn-join::before {
-      content: '⚓';
-      margin-right: 10px;
-      font-size: 13px;
     }
     #btn-join:hover {
       background: linear-gradient(180deg, #e0b830 0%, #c9a227 50%, #a07c18 100%);
@@ -335,7 +348,7 @@
       box-shadow: 0 0 8px rgba(201,162,39,0.6);
     }
     #status-text {
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(201,162,39,0.4);
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -358,7 +371,7 @@
     }
     #update-banner span {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(201,162,39,0.8);
       letter-spacing: 2px;
     }
@@ -367,7 +380,7 @@
       border: 1px solid rgba(201,162,39,0.5);
       color: #c9a227;
       font-family: 'Cinzel', serif;
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 2px;
       padding: 4px 12px;
       border-radius: 2px;
@@ -380,9 +393,9 @@
     #version {
       position: absolute;
       bottom: 10px;
-      right: 18px;
+      right: 74px;
       font-family: 'Cinzel', serif;
-      font-size: 10px;
+      font-size: 12px;
       color: rgba(201,162,39,0.2);
       letter-spacing: 2px;
     }
@@ -404,7 +417,7 @@
       border-radius: 3px;
       color: #e8d5b0;
       font-family: 'Lato', sans-serif;
-      font-size: 13px;
+      font-size: 15px;
       padding: 10px 14px;
       outline: none;
       transition: border-color 0.2s;
@@ -432,7 +445,7 @@
     .toggle-pw:hover { color: #e0c050; }
     .toggle-pw.active { color: #c9a227; }
     .auth-switch {
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(201,162,39,0.35);
       text-align: center;
       margin-top: 2px;
@@ -442,7 +455,7 @@
     .auth-switch button {
       background: none; border: none; cursor: pointer;
       color: rgba(201,162,39,0.7); font-family: 'Cinzel', serif;
-      font-size: 11px; letter-spacing: 1px; padding: 0;
+      font-size: 13px; letter-spacing: 1px; padding: 0;
       text-decoration: underline;
     }
     .auth-switch button:hover { color: #c9a227; }
@@ -451,15 +464,45 @@
       display: flex;
       align-items: center;
       gap: 7px;
-      font-size: 11px;
+      font-size: 13px;
       color: rgba(232,213,176,0.5);
       letter-spacing: 0.5px;
       cursor: pointer;
       margin-top: -2px;
     }
-    .remember-row input {
-      accent-color: #c9a227;
+    .remember-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin: 0;
+      border: 1px solid rgba(201,162,39,0.45);
+      border-radius: 3px;
+      background: rgba(201,162,39,0.05);
       cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .remember-row input[type="checkbox"]:hover {
+      border-color: #c9a227;
+      background: rgba(201,162,39,0.14);
+    }
+    .remember-row input[type="checkbox"]:checked {
+      background: linear-gradient(180deg, #e0b830 0%, #c9a227 50%, #a07c18 100%);
+      border-color: #c9a227;
+      box-shadow: 0 0 8px rgba(201,162,39,0.4);
+    }
+    .remember-row input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+      border: solid #1a0e00;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
     }
 
     #account-picker { position: relative; width: 280px; }
@@ -473,7 +516,7 @@
       border-radius: 3px;
       color: #e8d5b0;
       font-family: 'Lato', sans-serif;
-      font-size: 13px;
+      font-size: 15px;
       padding: 10px 14px;
       cursor: pointer;
       transition: border-color 0.2s;
@@ -519,7 +562,7 @@
     }
     .account-row-name {
       flex: 1;
-      font-size: 13px;
+      font-size: 15px;
       color: #e8d5b0;
     }
     .account-row-remove {
@@ -527,14 +570,14 @@
       border: none;
       color: rgba(232,213,176,0.3);
       cursor: pointer;
-      font-size: 13px;
+      font-size: 15px;
       padding: 4px;
       transition: color 0.2s;
     }
     .account-row-remove:hover { color: #e07a7a; }
     .account-section-label {
       font-family: 'Cinzel', serif;
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 1.5px;
       color: rgba(201,162,39,0.4);
       text-transform: uppercase;
@@ -543,32 +586,37 @@
 
     #user-info {
       display: none;
-      justify-content: center;
+      position: absolute;
+      right: calc(100% + 28px);
+      top: 50%;
+      transform: translateY(-50%);
     }
     #skin-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       background: rgba(201,162,39,0.05);
       border: 1px solid rgba(201,162,39,0.25);
       border-radius: 6px;
-      padding: 14px 22px;
+      padding: 20px 24px;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
+      white-space: nowrap;
     }
     #skin-card:hover { border-color: rgba(201,162,39,0.5); background: rgba(201,162,39,0.09); }
     #skin-viewer-3d {
-      width: 90px;
-      height: 130px;
+      width: 190px;
+      height: 300px;
       cursor: grab;
       flex-shrink: 0;
     }
     #skin-viewer-3d:active { cursor: grabbing; }
-    #skin-card-info { display: flex; flex-direction: column; gap: 6px; text-align: left; }
-    #username-display-line { font-size: 13px; color: rgba(232,213,176,0.6); font-weight: 300; }
+    #skin-card-info { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+    #username-display-line { font-size: 15px; color: rgba(232,213,176,0.6); font-weight: 300; }
     #grade-display {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 2px;
       color: rgba(201,162,39,0.6);
       text-transform: uppercase;
@@ -602,7 +650,7 @@
       background: none;
       border: none;
       color: rgba(232,213,176,0.4);
-      font-size: 15px;
+      font-size: 19px;
       cursor: pointer;
       z-index: 2;
       transition: color 0.2s;
@@ -625,7 +673,7 @@
       text-align: left;
       color: rgba(232,213,176,0.55);
       font-family: 'Cinzel', serif;
-      font-size: 12px;
+      font-size: 14px;
       letter-spacing: 1.5px;
       padding: 10px 12px;
       border-radius: 4px;
@@ -643,7 +691,7 @@
     .settings-tab-content.hidden { display: none !important; }
     .settings-page-title {
       font-family: 'Cinzel', serif;
-      font-size: 16px;
+      font-size: 20px;
       letter-spacing: 2px;
       color: #c9a227;
       text-transform: uppercase;
@@ -659,7 +707,7 @@
     }
     #settings-username {
       font-family: 'Cinzel', serif;
-      font-size: 15px;
+      font-size: 19px;
       color: #e8d5b0;
       letter-spacing: 1px;
     }
@@ -668,7 +716,7 @@
       border: 1px solid rgba(201,162,39,0.35);
       color: #c9a227;
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       padding: 10px 18px;
@@ -678,7 +726,7 @@
     }
     .settings-action-btn:hover { background: rgba(201,162,39,0.2); }
     .settings-desc {
-      font-size: 12.5px;
+      font-size: 15px;
       color: rgba(232,213,176,0.55);
       line-height: 1.5;
       max-width: 420px;
@@ -693,7 +741,7 @@
 
     .setting-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
     .setting-row label {
-      font-size: 12px;
+      font-size: 14px;
       color: rgba(232,213,176,0.7);
       letter-spacing: 0.5px;
     }
@@ -723,9 +771,6 @@
   <div id="titlebar">
     <span>Odal · Launcher</span>
     <div class="win-btns">
-      <button class="win-btn" id="btn-settings" title="Paramètres">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-      </button>
       <button class="win-btn" id="btn-min">—</button>
       <button class="win-btn" id="btn-close">✕</button>
     </div>
@@ -758,6 +803,8 @@
           <div class="settings-page-title">Skin</div>
           <p class="settings-desc" id="skin-tab-empty">Connecte-toi pour voir ton skin.</p>
           <img id="settings-skin" alt="" style="display:none;">
+          <button id="btn-change-skin" class="settings-action-btn" style="display:none; margin-top:16px;">Changer de skin</button>
+          <p class="settings-desc" id="skin-upload-status" style="display:none; margin-top:10px;"></p>
         </div>
 
         <div id="tab-params" class="settings-tab-content hidden">
@@ -798,14 +845,12 @@
 
   <div id="content">
     <div id="news-panel">
-      <div class="news-panel-header">Actualités d'Odal</div>
       <div id="news-list">
         <div class="news-empty">Chargement...</div>
       </div>
     </div>
 
     <div id="main-panel">
-      <div class="icon-symbol">⚓ &nbsp; ⚔</div>
       <div class="server-name">ODAL</div>
       <div class="title-divider"><span>✦</span></div>
       <div class="server-sub">Minecraft 1.20.1 &nbsp;·&nbsp; Forge</div>
@@ -813,16 +858,6 @@
       <div id="server-status">
         <span id="server-status-dot"></span>
         <span id="server-status-text">Connexion...</span>
-      </div>
-
-      <div id="user-info">
-        <div id="skin-card">
-          <canvas id="skin-viewer-3d" width="90" height="130"></canvas>
-          <div id="skin-card-info">
-            <div id="username-display-line">Conquérant : <strong id="username-display"></strong></div>
-            <div id="grade-display"></div>
-          </div>
-        </div>
       </div>
 
       <!-- Selection d'un compte enregistre : menu deroulant, reste visible connecte ou non -->
@@ -864,11 +899,26 @@
         </div>
       </div>
 
-      <button id="btn-join">Rejoindre Odal</button>
+      <div id="join-row">
+        <div id="user-info">
+          <div id="skin-card">
+            <canvas id="skin-viewer-3d" width="190" height="300"></canvas>
+            <div id="skin-card-info">
+              <div id="username-display-line"><strong id="username-display"></strong></div>
+              <div id="grade-display"></div>
+            </div>
+          </div>
+        </div>
+        <span id="join-spacer"></span>
+        <button id="btn-join">Rejoindre Odal</button>
+        <button id="btn-settings" title="Paramètres">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </button>
+      </div>
 
       <div id="progress-zone">
         <div id="progress-bar-bg"><div id="progress-bar"></div></div>
-        <div id="status-text">En attente...</div>
+        <div id="status-text"></div>
       </div>
     </div>
   </div>

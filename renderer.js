@@ -23,7 +23,7 @@ let skinViewer = null;
 
 function initSkinViewer() {
   const canvas = document.getElementById('skin-viewer-3d');
-  skinViewer = new skinview3d.SkinViewer({ canvas, width: 90, height: 130 });
+  skinViewer = new skinview3d.SkinViewer({ canvas, width: 190, height: 300 });
   skinViewer.autoRotate = true;
   skinViewer.autoRotateSpeed = 0.6;
   skinViewer.zoom = 0.9;
@@ -62,7 +62,7 @@ function renderAccountList(containerId) {
   if (!savedAccounts.length) { el.innerHTML = ''; return; }
   el.innerHTML = savedAccounts.map((a) => `
     <div class="account-row${isLoggedIn && a.username === usernameDisplay.textContent ? ' active' : ''}" data-username="${escapeHtml(a.username)}">
-      <img class="account-row-avatar" src="https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(a.username)}&size=32" alt="">
+      <img class="account-row-avatar" src="https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(a.username)}&size=32&t=${Date.now()}" alt="">
       <span class="account-row-name">${escapeHtml(a.username)}</span>
       <button class="account-row-remove" data-username="${escapeHtml(a.username)}" title="Oublier ce compte">✕</button>
     </div>
@@ -106,7 +106,7 @@ async function loginWithAccount(username) {
       return;
     }
     onLoginSuccess(result.username, result.grade);
-    setStatus('En attente...');
+    setStatus('');
   } finally {
     btnJoin.disabled = false;
     accountSwitchBusy = false;
@@ -130,7 +130,7 @@ function updateAuthView() {
   userInfo.style.display = (isLoggedIn && !showAddAccountForm) ? 'flex' : 'none';
 
   btnJoin.textContent = showRegister ? 'Créer mon compte' : 'Rejoindre Odal';
-  setStatus('En attente...');
+  setStatus('');
 }
 
 function openAddAccountForm() {
@@ -191,16 +191,43 @@ function openSettings(tab) {
   if (tab === 'skin') {
     const skinImg = document.getElementById('settings-skin');
     const skinEmpty = document.getElementById('skin-tab-empty');
+    const btnChangeSkin = document.getElementById('btn-change-skin');
+    const uploadStatus = document.getElementById('skin-upload-status');
+    uploadStatus.style.display = 'none';
     if (usernameDisplay.textContent) {
       skinEmpty.style.display = 'none';
       skinImg.style.display = '';
       skinImg.src = `https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(usernameDisplay.textContent)}&size=128&t=${Date.now()}`;
+      btnChangeSkin.style.display = '';
     } else {
       skinEmpty.style.display = '';
       skinImg.style.display = 'none';
+      btnChangeSkin.style.display = 'none';
     }
   }
 }
+
+document.getElementById('btn-change-skin').addEventListener('click', async () => {
+  const uploadStatus = document.getElementById('skin-upload-status');
+  const filePath = await window.launcher.pickSkinFile();
+  if (!filePath) return;
+
+  uploadStatus.style.display = '';
+  uploadStatus.style.color = 'rgba(232,213,176,0.6)';
+  uploadStatus.textContent = 'Envoi en cours...';
+
+  const result = await window.launcher.uploadSkin(filePath);
+  if (result.success) {
+    uploadStatus.style.color = '#4ade80';
+    uploadStatus.textContent = 'Skin mis à jour !';
+    const username = usernameDisplay.textContent;
+    document.getElementById('settings-skin').src = `https://${siteApi}/api/skin_head.php?user=${encodeURIComponent(username)}&size=128&t=${Date.now()}`;
+    setSkinHead(username);
+  } else {
+    uploadStatus.style.color = '#e07a7a';
+    uploadStatus.textContent = result.error || "Erreur lors de l'envoi du skin";
+  }
+});
 
 document.querySelectorAll('.settings-tab').forEach((tabBtn) => {
   tabBtn.addEventListener('click', () => openSettings(tabBtn.dataset.tab));
@@ -395,7 +422,7 @@ window.launcher.on('progress', (val) => setProgress(val));
 window.launcher.on('status',   (msg) => setStatus(msg));
 window.launcher.on('game-closed', () => {
   btnJoin.disabled = false;
-  setStatus('En attente...');
+  setStatus('');
   setProgress(0);
 });
 

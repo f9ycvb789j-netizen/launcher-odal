@@ -20,5 +20,7 @@ contextBridge.exposeInMainWorld('launcher', {
   getServerStatus: () => ipcRenderer.invoke('get-server-status'),
   getNews: () => ipcRenderer.invoke('get-news'),
   logout: () => ipcRenderer.invoke('logout'),
-  openGameFolder: (key) => ipcRenderer.invoke('open-game-folder', key)
+  openGameFolder: (key) => ipcRenderer.invoke('open-game-folder', key),
+  pickSkinFile: () => ipcRenderer.invoke('pick-skin-file'),
+  uploadSkin: (filePath) => ipcRenderer.invoke('upload-skin', filePath)
 });
