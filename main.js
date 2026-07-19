@@ -526,9 +526,11 @@ function writeServersDat(gameDir) {
 
 async function syncMods(modsDir, event) {
   // OptiFine retire du modpack : supprime les copies deja installees chez les joueurs.
+  // odalcurrency-1.0.0 remplace par odalcurrency-1.0.1 (contenu modifie, meme mod id) :
+  // supprime l'ancien jar pour eviter un conflit de mod en double chez les joueurs deja a jour.
   if (fs.existsSync(modsDir)) {
     for (const file of fs.readdirSync(modsDir)) {
-      if (/^OptiFine.*\.jar$/i.test(file)) {
+      if (/^OptiFine.*\.jar$/i.test(file) || file === 'odalcurrency-1.0.0.jar') {
         fs.unlinkSync(path.join(modsDir, file));
       }
     }
