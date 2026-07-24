@@ -29,7 +29,7 @@ const { status: mcStatus } = require('minecraft-server-util');
 
 const SERVER_IP = 'odal.minesr.com';
 const SERVER_PORT = 25565;
-const FORGE_VERSION = '1.20.1-47.2.20';
+const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.6 Chrome/124.0.0.0 Safari/537.36';
@@ -357,16 +357,23 @@ ipcMain.handle('register-site', async (event, mc_username, email, password) => {
 
 ipcMain.handle('launch', async (event) => {
   const modsDir = path.join(GAME_DIR, 'mods');
-  const FORGE_JAR = path.join(app.getPath('userData'), 'forge-installer.jar');
-  const forgeVersionDir = path.join(GAME_DIR, 'versions', `1.20.1-forge-${FORGE_VERSION}`);
-  const forgeInstalled = fs.existsSync(forgeVersionDir);
+  // Un nom versionne empeche la reutilisation d'un ancien installateur Forge.
+  const FORGE_JAR = path.join(app.getPath('userData'), `forge-${FORGE_VERSION}-installer.jar`);
+  // MCLC met Forge en cache par version Minecraft. Regenerer ce cache si la
+  // build qu'il contient ne correspond pas a celle exigee par le serveur.
+  const forgeVersionFile = path.join(GAME_DIR, 'forge', '1.20.1', 'version.json');
+  const forgeInstalled = fs.existsSync(forgeVersionFile)
+    && fs.readFileSync(forgeVersionFile, 'utf8').includes(FORGE_VERSION);
+  if (!forgeInstalled && fs.existsSync(forgeVersionFile)) {
+    fs.unlinkSync(forgeVersionFile);
+  }
 
   if (!fs.existsSync(modsDir)) fs.mkdirSync(modsDir, { recursive: true });
 
   send(event, 'status', 'Vérification de Forge...');
   send(event, 'progress', 5);
 
-  if (!forgeInstalled) {
+  if (!forgeInstalled || !fs.existsSync(FORGE_JAR)) {
     if (!fs.existsSync(FORGE_JAR)) {
       send(event, 'status', 'Téléchargement de Forge...');
       await download(FORGE_DOWNLOAD_URL, FORGE_JAR, (p) => {
@@ -418,7 +425,8 @@ ipcMain.handle('launch', async (event) => {
       type: 'release'
     },
     javaPath,
-    forge: forgeInstalled ? undefined : FORGE_JAR,
+    // Toujours fournir l'installateur pour charger Forge, meme si son cache existe.
+    forge: FORGE_JAR,
     memory: { max: `${settings.ramGB}G`, min: '1G' }
   });
 
