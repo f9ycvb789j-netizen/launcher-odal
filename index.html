@@ -103,6 +103,25 @@
     }
     .win-btn:hover { color: #c9a227; background: rgba(201,162,39,0.08); }
     #btn-close:hover { color: #e05a5a; background: rgba(224,90,90,0.1); }
+    #btn-website {
+      -webkit-app-region: no-drag;
+      margin-right: 8px;
+      padding: 4px 11px;
+      border: 1px solid rgba(201,162,39,0.45);
+      border-radius: 3px;
+      background: rgba(201,162,39,0.08);
+      color: rgba(201,162,39,0.8);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #btn-website:hover {
+      color: #f0d36b;
+      border-color: #c9a227;
+      background: rgba(201,162,39,0.18);
+    }
 
     /* Ligne bouton rejoindre + parametres */
     #join-row {
@@ -771,6 +790,7 @@
   <div id="titlebar">
     <span>Odal · Launcher</span>
     <div class="win-btns">
+      <button id="btn-website" title="Ouvrir odalmc.fr">SITE WEB</button>
       <button class="win-btn" id="btn-min">—</button>
       <button class="win-btn" id="btn-close">✕</button>
     </div>

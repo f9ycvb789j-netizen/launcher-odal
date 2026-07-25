@@ -1,5 +1,6 @@
 const btnMin    = document.getElementById('btn-min');
 const btnClose  = document.getElementById('btn-close');
+const btnWebsite = document.getElementById('btn-website');
 const btnSettings   = document.getElementById('btn-settings');
 const settingsOverlay = document.getElementById('settings-overlay');
 const settingsClose = document.getElementById('settings-close');
@@ -318,6 +319,7 @@ window.switchAuth = switchAuth;
 
 btnMin.addEventListener('click', () => window.launcher.minimize());
 btnClose.addEventListener('click', () => window.launcher.close());
+btnWebsite.addEventListener('click', () => window.launcher.openUrl('https://odalmc.fr'));
 
 btnJoin.addEventListener('click', async () => {
   if (isLoggedIn && !showAddAccountForm) {

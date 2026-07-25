@@ -560,11 +560,13 @@ function writeServersDat(gameDir) {
 }
 
 async function syncMods(modsDir, event) {
-  // odalcurrency-1.0.0 remplace par odalcurrency-1.0.1 (contenu modifie, meme mod id) :
-  // supprime l'ancien jar pour eviter un conflit de mod en double chez les joueurs deja a jour.
+  // Supprime les anciens jars remplaces ou retires pour eviter les doublons
+  // chez les joueurs deja a jour.
   if (fs.existsSync(modsDir)) {
     for (const file of fs.readdirSync(modsDir)) {
-      if (file === 'odalcurrency-1.0.0.jar') {
+      if (file === 'odalcurrency-1.0.0.jar' ||
+          file === 'OptiFine_1.20.1_HD_U_I6.jar' ||
+          file.startsWith('odaltaczloginfix-')) {
         fs.unlinkSync(path.join(modsDir, file));
       }
     }
@@ -579,13 +581,25 @@ async function syncMods(modsDir, event) {
   for (let i = 0; i < mods.length; i++) {
     const mod = mods[i];
     const dest = path.join(modsDir, mod.name);
+    const localSrc = path.join(localPackDir, mod.name);
 
     if (fs.existsSync(dest)) {
+      if (fs.existsSync(localSrc)) {
+        const sourceStat = fs.statSync(localSrc);
+        const destStat = fs.statSync(dest);
+        const filesDiffer = sourceStat.size !== destStat.size
+          || crypto.createHash('sha256').update(fs.readFileSync(localSrc)).digest('hex')
+            !== crypto.createHash('sha256').update(fs.readFileSync(dest)).digest('hex');
+
+        if (filesDiffer) {
+          send(event, 'status', `Mise à jour : ${mod.name}`);
+          fs.copyFileSync(localSrc, dest);
+        }
+      }
       send(event, 'progress', 45 + Math.round(((i + 1) / mods.length) * 15));
       continue;
     }
 
-    const localSrc = path.join(localPackDir, mod.name);
     if (fs.existsSync(localSrc)) {
       send(event, 'status', `Copie : ${mod.name}`);
       fs.copyFileSync(localSrc, dest);
