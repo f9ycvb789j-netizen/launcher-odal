@@ -33,9 +33,11 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.19 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.20 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
+const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
+const REQUIRED_GUI_MOD_SHA256 = '12fa4d53ef00624e567032794ec52cdb33f25c99715fbb927952789e6076a0e1';
 
 let mainWindow;
 let currentUser = null;
@@ -592,6 +594,23 @@ async function syncMods(modsDir, event) {
 
   const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
   const expectedJars = new Set(mods.map((mod) => mod.name.toLowerCase()));
+  // Les mods sont des ressources externes à app.asar. Ce chemin fonctionne de
+  // façon identique dans Resources/ sur macOS et resources/ sur Windows.
+  const packagedPackDir = path.join(process.resourcesPath, 'mods-pack');
+  const localPackDir = fs.existsSync(packagedPackDir)
+    ? packagedPackDir
+    : path.join(__dirname, 'mods-pack');
+  const guiModSource = path.join(localPackDir, REQUIRED_GUI_MOD);
+
+  if (!expectedJars.has(REQUIRED_GUI_MOD.toLowerCase()) || !fs.existsSync(guiModSource)) {
+    throw new Error(`Le mod obligatoire ${REQUIRED_GUI_MOD} manque dans le launcher`);
+  }
+  const guiModHash = crypto.createHash('sha256')
+    .update(fs.readFileSync(guiModSource))
+    .digest('hex');
+  if (guiModHash !== REQUIRED_GUI_MOD_SHA256) {
+    throw new Error(`La version embarquée de ${REQUIRED_GUI_MOD} est incorrecte`);
+  }
 
   // Le dossier du launcher est la source de verite : supprimer tout ancien
   // mod retire du pack pour que les joueurs aient exactement la meme liste.
@@ -603,8 +622,6 @@ async function syncMods(modsDir, event) {
       }
     }
   }
-
-  const localPackDir = path.join(__dirname, 'mods-pack');
 
   for (let i = 0; i < mods.length; i++) {
     const mod = mods[i];

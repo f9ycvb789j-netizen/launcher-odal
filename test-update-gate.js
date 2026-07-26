@@ -2,10 +2,10 @@ const assert = require('assert');
 const fs = require('fs');
 const { isNewerVersion } = require('./updater-utils');
 
-assert.strictEqual(isNewerVersion('1.1.19', '1.1.18'), true);
+assert.strictEqual(isNewerVersion('1.1.20', '1.1.19'), true);
 assert.strictEqual(isNewerVersion('1.2.0', '1.1.99'), true);
 assert.strictEqual(isNewerVersion('1.1.18', '1.1.18'), false);
-assert.strictEqual(isNewerVersion('1.1.18', '1.1.19'), false);
+assert.strictEqual(isNewerVersion('1.1.19', '1.1.20'), false);
 assert.strictEqual(isNewerVersion('2.0', '1.99.99'), true);
 
 const html = fs.readFileSync('index.html', 'utf8');
@@ -35,15 +35,14 @@ if (process.argv[2]) {
   const asar = require('@electron/asar');
   const archivePath = process.argv[2];
   const packagedFiles = asar.listPackage(archivePath);
-  const packagedMods = packagedFiles.filter((file) =>
-    file.startsWith('\\mods-pack\\') && file.endsWith('.jar')
-  );
 
   for (const requiredFile of ['\\main.js', '\\renderer.js', '\\index.html', '\\updater-utils.js']) {
     assert.ok(packagedFiles.includes(requiredFile), `Fichier absent de l'application : ${requiredFile}`);
   }
-  assert.strictEqual(packagedMods.length, 22, 'Le pack doit contenir exactement 22 mods');
-  assert.ok(!packagedMods.some((file) => /odalcurrency|optifine/i.test(file)), 'Ancien mod embarqué');
+  assert.ok(
+    !packagedFiles.some((file) => file.startsWith('\\mods-pack\\')),
+    'Les mods doivent être des ressources externes à app.asar'
+  );
 
   const packagedHtml = asar.extractFile(archivePath, 'index.html').toString('utf8');
   assert.ok(packagedHtml.includes('id="update-gate"'), 'Écran absent de l’application compilée');

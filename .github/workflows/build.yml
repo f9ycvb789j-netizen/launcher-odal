@@ -15,6 +15,8 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
+      - name: Verify bundled mods
+        run: npm run test:packaging
       - name: Build Windows
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,6 +36,8 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
+      - name: Verify bundled mods
+        run: npm run test:packaging
       - name: Prepare Apple API key
         shell: bash
         env:
@@ -50,6 +54,12 @@ jobs:
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:mac
+      - name: Verify Mac application resources
+        shell: bash
+        run: |
+          RESOURCES_DIR="$(find dist -type d -path '*/Odal Launcher.app/Contents/Resources' -print -quit)"
+          test -n "$RESOURCES_DIR"
+          node test-packaging.js "$RESOURCES_DIR"
       - name: Upload Mac artifact
         uses: actions/upload-artifact@v4
         with:

@@ -1,11 +1,12 @@
 {
   "name": "launcher-odal",
-  "version": "1.1.19",
+  "version": "1.1.20",
   "description": "Launcher Serveur Odal",
   "main": "main.js",
   "scripts": {
     "start": "powershell -Command \"$env:ELECTRON_RUN_AS_NODE=$null; node node_modules/electron/cli.js .\"",
     "test:update-gate": "node test-update-gate.js",
+    "test:packaging": "node test-packaging.js",
     "build:win": "electron-builder --win nsis --x64",
     "build:mac": "electron-builder --mac dmg",
     "build": "electron-builder --win nsis --x64"
@@ -22,8 +23,16 @@
       "skinview3d.bundle.js",
       "background.png",
       "mods-manifest.json",
-      "mods-pack/**",
       "node_modules/**"
+    ],
+    "extraResources": [
+      {
+        "from": "mods-pack",
+        "to": "mods-pack",
+        "filter": [
+          "**/*.jar"
+        ]
+      }
     ],
     "win": {
       "target": [
