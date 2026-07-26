@@ -4,6 +4,7 @@ const fs = require('fs');
 const https = require('https');
 const crypto = require('crypto');
 const { isNewerVersion } = require('./updater-utils');
+const { getPlatformMods } = require('./mod-platform');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -33,12 +34,12 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.23 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.24 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 const REQUIRED_GUI_MOD_SHA256_WINDOWS = 'b110562ae680b37f7fb736c17616a2bc405ed79884f0cecda09e9a58066384a3';
-const REQUIRED_GUI_MOD_SHA256_MAC = '8b4747bb9fe27c7095d83abd7132a69b21e072270c5f2ada73864deadbece3af';
+const REQUIRED_GUI_MOD_SHA256_MAC = 'b110562ae680b37f7fb736c17616a2bc405ed79884f0cecda09e9a58066384a3';
 
 let mainWindow;
 let currentUser = null;
@@ -594,7 +595,8 @@ async function syncMods(modsDir, event) {
   if (!fs.existsSync(manifest)) return;
 
   const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
-  const expectedJars = new Set(mods.map((mod) => mod.name.toLowerCase()));
+  const platformMods = getPlatformMods(mods);
+  const expectedJars = new Set(platformMods.map((mod) => mod.name.toLowerCase()));
   // Le mod GUI est aussi livré comme ressource externe à app.asar afin que sa
   // copie soit fiable sur macOS. Les autres mods restent disponibles dans
   // app.asar, ce qui évite qu'Apple inspecte les binaires natifs de leurs jars.
@@ -628,8 +630,8 @@ async function syncMods(modsDir, event) {
     }
   }
 
-  for (let i = 0; i < mods.length; i++) {
-    const mod = mods[i];
+  for (let i = 0; i < platformMods.length; i++) {
+    const mod = platformMods[i];
     const dest = path.join(modsDir, mod.name);
     const externalSrc = mod.name === REQUIRED_GUI_MOD ? guiModSource : path.join(packagedPackDir, mod.name);
     const archivedSrc = path.join(archivedPackDir, mod.name);
@@ -648,7 +650,7 @@ async function syncMods(modsDir, event) {
           fs.copyFileSync(localSrc, dest);
         }
       }
-      send(event, 'progress', 45 + Math.round(((i + 1) / mods.length) * 15));
+      send(event, 'progress', 45 + Math.round(((i + 1) / platformMods.length) * 15));
       continue;
     }
 
@@ -662,7 +664,7 @@ async function syncMods(modsDir, event) {
       send(event, 'status', `Mod manquant : ${mod.name}`);
     }
 
-    send(event, 'progress', 45 + Math.round(((i + 1) / mods.length) * 15));
+    send(event, 'progress', 45 + Math.round(((i + 1) / platformMods.length) * 15));
   }
 }
 

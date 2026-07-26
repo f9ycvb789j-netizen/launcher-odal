@@ -2,10 +2,11 @@ const assert = require('assert');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { getPlatformMods } = require('./mod-platform');
 
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 const REQUIRED_GUI_MOD_SHA256 = 'b110562ae680b37f7fb736c17616a2bc405ed79884f0cecda09e9a58066384a3';
-const REQUIRED_GUI_MOD_SHA256_MAC = '8b4747bb9fe27c7095d83abd7132a69b21e072270c5f2ada73864deadbece3af';
+const REQUIRED_GUI_MOD_SHA256_MAC = 'b110562ae680b37f7fb736c17616a2bc405ed79884f0cecda09e9a58066384a3';
 const EXPECTED_MOD_COUNT = 22;
 
 function sha256(file) {
@@ -52,10 +53,24 @@ assert.deepStrictEqual(
 
 assert.ok(packageJson.build.files.includes('mods-pack/**'), 'Le pack complet doit rester dans app.asar');
 assert.ok(packageJson.build.files.includes('mods-pack-mac/**'), 'Le GUI Mac doit rester dans app.asar');
+assert.ok(packageJson.build.files.includes('mod-platform.js'), 'La regle de plateforme doit etre emballee');
 
 const manifest = JSON.parse(fs.readFileSync('mods-manifest.json', 'utf8'));
 assert.strictEqual(manifest.length, EXPECTED_MOD_COUNT, `Le manifeste doit contenir ${EXPECTED_MOD_COUNT} mods`);
 assert.ok(manifest.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le mod GUI manque dans le manifeste');
+const windowsMods = getPlatformMods(manifest, 'win32');
+const macMods = getPlatformMods(manifest, 'darwin');
+assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 22 mods');
+assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT - 2, 'Mac doit contenir 20 mods');
+for (const excludedName of [
+  'embeddium-0.3.31+mc1.20.1.jar',
+  'oculus-mc1.20.1-1.8.0 .jar'
+]) {
+  assert.ok(windowsMods.some((mod) => mod.name === excludedName), `${excludedName} doit rester sur Windows`);
+  assert.ok(!macMods.some((mod) => mod.name === excludedName), `${excludedName} doit etre retire sur Mac`);
+}
+assert.ok(windowsMods.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le GUI doit rester sur Windows');
+assert.ok(macMods.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le GUI du Bureau doit etre present sur Mac');
 
 verifySourcePack(path.join(process.cwd(), 'mods-pack'));
 verifyMacGuiMod(path.join(process.cwd(), 'mods-pack-mac', REQUIRED_GUI_MOD));
