@@ -32,7 +32,7 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.6 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.18 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 
@@ -560,23 +560,24 @@ function writeServersDat(gameDir) {
 }
 
 async function syncMods(modsDir, event) {
-  // Supprime les anciens jars remplaces ou retires pour eviter les doublons
-  // chez les joueurs deja a jour.
+  const manifest = path.join(__dirname, 'mods-manifest.json');
+  if (!fs.existsSync(manifest)) return;
+
+  const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+  const expectedJars = new Set(mods.map((mod) => mod.name.toLowerCase()));
+
+  // Le dossier du launcher est la source de verite : supprimer tout ancien
+  // mod retire du pack pour que les joueurs aient exactement la meme liste.
   if (fs.existsSync(modsDir)) {
     for (const file of fs.readdirSync(modsDir)) {
-      if (file === 'odalcurrency-1.0.0.jar' ||
-          file === 'OptiFine_1.20.1_HD_U_I6.jar' ||
-          file.startsWith('odaltaczloginfix-')) {
+      if (file.toLowerCase().endsWith('.jar') &&
+          !expectedJars.has(file.toLowerCase())) {
         fs.unlinkSync(path.join(modsDir, file));
       }
     }
   }
 
-  const manifest = path.join(__dirname, 'mods-manifest.json');
-  if (!fs.existsSync(manifest)) return;
-
   const localPackDir = path.join(__dirname, 'mods-pack');
-  const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
 
   for (let i = 0; i < mods.length; i++) {
     const mod = mods[i];
