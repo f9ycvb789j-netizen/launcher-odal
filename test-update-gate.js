@@ -34,12 +34,13 @@ assert.ok(main.includes("ipcMain.handle('retry-update'"), 'Le bouton Réessayer 
 if (process.argv[2]) {
   const asar = require('@electron/asar');
   const archivePath = process.argv[2];
-  const packagedFiles = asar.listPackage(archivePath);
+  const packagedFiles = asar.listPackage(archivePath)
+    .map((file) => file.replaceAll('\\', '/'));
   const packagedMods = packagedFiles.filter((file) =>
-    file.startsWith('\\mods-pack\\') && file.endsWith('.jar')
+    file.startsWith('/mods-pack/') && file.endsWith('.jar')
   );
 
-  for (const requiredFile of ['\\main.js', '\\renderer.js', '\\index.html', '\\updater-utils.js']) {
+  for (const requiredFile of ['/main.js', '/renderer.js', '/index.html', '/updater-utils.js']) {
     assert.ok(packagedFiles.includes(requiredFile), `Fichier absent de l'application : ${requiredFile}`);
   }
   assert.strictEqual(packagedMods.length, 22, 'Le pack doit contenir exactement 22 mods');
