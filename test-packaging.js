@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-const REQUIRED_GUI_MOD_SHA256 = '12fa4d53ef00624e567032794ec52cdb33f25c99715fbb927952789e6076a0e1';
+const REQUIRED_GUI_MOD_SHA256 = 'b110562ae680b37f7fb736c17616a2bc405ed79884f0cecda09e9a58066384a3';
 const EXPECTED_MOD_COUNT = 22;
 
 function sha256(file) {
