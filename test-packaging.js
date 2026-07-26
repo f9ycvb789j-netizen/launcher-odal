@@ -61,13 +61,13 @@ assert.ok(manifest.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le mod GUI man
 const windowsMods = getPlatformMods(manifest, 'win32');
 const macMods = getPlatformMods(manifest, 'darwin');
 assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 22 mods');
-assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT - 2, 'Mac doit contenir 20 mods');
-for (const excludedName of [
+assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 22 mods');
+for (const restoredName of [
   'embeddium-0.3.31+mc1.20.1.jar',
   'oculus-mc1.20.1-1.8.0 .jar'
 ]) {
-  assert.ok(windowsMods.some((mod) => mod.name === excludedName), `${excludedName} doit rester sur Windows`);
-  assert.ok(!macMods.some((mod) => mod.name === excludedName), `${excludedName} doit etre retire sur Mac`);
+  assert.ok(windowsMods.some((mod) => mod.name === restoredName), `${restoredName} doit rester sur Windows`);
+  assert.ok(macMods.some((mod) => mod.name === restoredName), `${restoredName} doit etre restaure sur Mac`);
 }
 assert.ok(windowsMods.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le GUI doit rester sur Windows');
 assert.ok(macMods.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le GUI du Bureau doit etre present sur Mac');
