@@ -23,6 +23,7 @@
       "skinview3d.bundle.js",
       "background.png",
       "mods-manifest.json",
+      "mods-pack/**",
       "node_modules/**"
     ],
     "extraResources": [
@@ -30,7 +31,7 @@
         "from": "mods-pack",
         "to": "mods-pack",
         "filter": [
-          "**/*.jar"
+          "islandfactionsgui-1.0.0.jar"
         ]
       }
     ],

@@ -594,13 +594,12 @@ async function syncMods(modsDir, event) {
 
   const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
   const expectedJars = new Set(mods.map((mod) => mod.name.toLowerCase()));
-  // Les mods sont des ressources externes à app.asar. Ce chemin fonctionne de
-  // façon identique dans Resources/ sur macOS et resources/ sur Windows.
+  // Le mod GUI est aussi livré comme ressource externe à app.asar afin que sa
+  // copie soit fiable sur macOS. Les autres mods restent disponibles dans
+  // app.asar, ce qui évite qu'Apple inspecte les binaires natifs de leurs jars.
   const packagedPackDir = path.join(process.resourcesPath, 'mods-pack');
-  const localPackDir = fs.existsSync(packagedPackDir)
-    ? packagedPackDir
-    : path.join(__dirname, 'mods-pack');
-  const guiModSource = path.join(localPackDir, REQUIRED_GUI_MOD);
+  const archivedPackDir = path.join(__dirname, 'mods-pack');
+  const guiModSource = path.join(packagedPackDir, REQUIRED_GUI_MOD);
 
   if (!expectedJars.has(REQUIRED_GUI_MOD.toLowerCase()) || !fs.existsSync(guiModSource)) {
     throw new Error(`Le mod obligatoire ${REQUIRED_GUI_MOD} manque dans le launcher`);
@@ -626,7 +625,9 @@ async function syncMods(modsDir, event) {
   for (let i = 0; i < mods.length; i++) {
     const mod = mods[i];
     const dest = path.join(modsDir, mod.name);
-    const localSrc = path.join(localPackDir, mod.name);
+    const externalSrc = path.join(packagedPackDir, mod.name);
+    const archivedSrc = path.join(archivedPackDir, mod.name);
+    const localSrc = fs.existsSync(externalSrc) ? externalSrc : archivedSrc;
 
     if (fs.existsSync(dest)) {
       if (fs.existsSync(localSrc)) {

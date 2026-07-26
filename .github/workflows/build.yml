@@ -60,6 +60,7 @@ jobs:
           RESOURCES_DIR="$(find dist -type d -path '*/Odal Launcher.app/Contents/Resources' -print -quit)"
           test -n "$RESOURCES_DIR"
           node test-packaging.js "$RESOURCES_DIR"
+          node test-update-gate.js "$RESOURCES_DIR/app.asar"
       - name: Upload Mac artifact
         uses: actions/upload-artifact@v4
         with:
