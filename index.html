@@ -408,6 +408,112 @@
     }
     #update-btn:hover { background: rgba(201,162,39,0.35); }
 
+    /* Écran de vérification et de mise à jour bloquant */
+    #update-gate {
+      position: fixed;
+      top: 36px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 35;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(201,162,39,0.12), transparent 32%),
+        linear-gradient(180deg, rgba(8,7,5,0.94), rgba(5,5,4,0.985));
+      backdrop-filter: blur(12px);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    #update-gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .update-gate-card {
+      width: min(520px, calc(100vw - 64px));
+      padding: 48px 52px 42px;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(25,21,12,0.92), rgba(10,9,6,0.96));
+      border: 1px solid rgba(201,162,39,0.32);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.65), inset 0 0 40px rgba(201,162,39,0.035);
+      clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+    }
+    .update-gate-mark {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 24px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(201,162,39,0.48);
+      color: #d6b54a;
+      font: 30px 'Cinzel', serif;
+      box-shadow: 0 0 30px rgba(201,162,39,0.12), inset 0 0 22px rgba(201,162,39,0.08);
+      transform: rotate(45deg);
+    }
+    .update-gate-mark span { transform: rotate(-45deg); }
+    #update-gate-title {
+      margin: 0 0 12px;
+      color: #e5c85f;
+      font: 600 22px 'Cinzel', serif;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    #update-gate-message {
+      min-height: 42px;
+      margin: 0 auto 27px;
+      color: rgba(232,213,176,0.62);
+      font-size: 14px;
+      line-height: 1.6;
+      letter-spacing: 0.5px;
+    }
+    .update-gate-progress {
+      height: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(201,162,39,0.18);
+      background: rgba(201,162,39,0.07);
+    }
+    #update-gate-progress-bar {
+      width: 7%;
+      height: 100%;
+      background: linear-gradient(90deg, #71520d, #c9a227, #efd66d);
+      box-shadow: 0 0 12px rgba(201,162,39,0.5);
+      transition: width 0.3s ease;
+    }
+    #update-gate-percent {
+      margin-top: 10px;
+      color: rgba(201,162,39,0.55);
+      font: 12px 'Cinzel', serif;
+      letter-spacing: 2px;
+    }
+    .update-gate-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      min-height: 40px;
+      margin-top: 22px;
+    }
+    .update-gate-action {
+      display: none;
+      padding: 10px 22px;
+      border: 1px solid rgba(201,162,39,0.45);
+      background: rgba(201,162,39,0.1);
+      color: #d6b54a;
+      font: 12px 'Cinzel', serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .update-gate-action:hover { background: rgba(201,162,39,0.2); }
+    .update-gate-action.visible { display: inline-flex; }
+    .update-gate-action:disabled { opacity: 0.45; cursor: wait; }
+    #update-gate-version {
+      margin-top: 16px;
+      color: rgba(201,162,39,0.28);
+      font: 11px 'Cinzel', serif;
+      letter-spacing: 2px;
+    }
+
     /* Version */
     #version {
       position: absolute;
@@ -775,6 +881,23 @@
   <div id="update-banner">
     <span id="update-text">Mise à jour disponible</span>
     <button id="update-btn" onclick="doUpdate()">Télécharger</button>
+  </div>
+
+  <div id="update-gate" aria-live="polite">
+    <div class="update-gate-card">
+      <div class="update-gate-mark"><span>O</span></div>
+      <h1 id="update-gate-title">Vérification</h1>
+      <p id="update-gate-message">Recherche de la dernière version du launcher Odal…</p>
+      <div class="update-gate-progress">
+        <div id="update-gate-progress-bar"></div>
+      </div>
+      <div id="update-gate-percent">CONNEXION…</div>
+      <div class="update-gate-actions">
+        <button id="update-gate-retry" class="update-gate-action">Réessayer</button>
+        <button id="update-gate-close" class="update-gate-action">Fermer</button>
+      </div>
+      <div id="update-gate-version">ODAL LAUNCHER</div>
+    </div>
   </div>
 
   <div id="bg"></div>

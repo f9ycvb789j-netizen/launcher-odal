@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const crypto = require('crypto');
+const { isNewerVersion } = require('./updater-utils');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -32,12 +33,14 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.18 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.19 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 
 let mainWindow;
 let currentUser = null;
+let updateGateOpen = true;
+let updateCheckInProgress = false;
 
 // Reessaie le telechargement en cas d'echec transitoire (ex: rate-limit temporaire de l'hebergeur).
 async function downloadWithRetries(url, dest, onProgress, retries = 3) {
@@ -53,12 +56,22 @@ async function downloadWithRetries(url, dest, onProgress, retries = 3) {
 }
 
 async function checkForUpdates() {
+  if (updateCheckInProgress) return;
+  updateCheckInProgress = true;
+  updateGateOpen = true;
+  mainWindow.webContents.send('update-status', { status: 'checking' });
+
   try {
     const data = await httpsGet(`https://${SITE_API}/version.json`);
     const remote = JSON.parse(data);
-    if (!remote.version || remote.version === CURRENT_VERSION) return;
+    if (!remote.version || !isNewerVersion(remote.version, CURRENT_VERSION)) {
+      updateGateOpen = false;
+      mainWindow.webContents.send('update-status', { status: 'up-to-date', version: CURRENT_VERSION });
+      return;
+    }
 
     const url = process.platform === 'win32' ? remote.windows : remote.mac;
+    if (!url) throw new Error('Lien de mise a jour manquant');
     mainWindow.webContents.send('update-status', { status: 'downloading', version: remote.version });
 
     if (process.platform === 'win32') {
@@ -124,9 +137,11 @@ async function checkForUpdates() {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('update-status', {
         status: 'error',
-        message: 'Mise à jour indisponible pour le moment. Tu peux continuer à jouer avec la version actuelle.'
+        message: 'Impossible de vérifier la mise à jour. Réessaie pour accéder au launcher.'
       });
     }
+  } finally {
+    updateCheckInProgress = false;
   }
 }
 
@@ -146,9 +161,10 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+  mainWindow.webContents.once('did-finish-load', checkForUpdates);
 }
 
-app.whenReady().then(() => { createWindow(); setTimeout(checkForUpdates, 2000); });
+app.whenReady().then(createWindow);
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 
 ipcMain.on('minimize', () => mainWindow.minimize());
@@ -156,6 +172,10 @@ ipcMain.on('close', () => app.quit());
 ipcMain.on('open-url', (e, url) => shell.openExternal(url));
 
 ipcMain.handle('get-site-api', () => SITE_API);
+ipcMain.handle('retry-update', async () => {
+  await checkForUpdates();
+  return { success: !updateGateOpen };
+});
 
 ipcMain.handle('logout', () => {
   currentUser = null;
@@ -356,6 +376,13 @@ ipcMain.handle('register-site', async (event, mc_username, email, password) => {
 });
 
 ipcMain.handle('launch', async (event) => {
+  if (updateGateOpen) {
+    return {
+      success: false,
+      error: 'La vérification de mise à jour doit se terminer avant de jouer.'
+    };
+  }
+
   const modsDir = path.join(GAME_DIR, 'mods');
   // Un nom versionne empeche la reutilisation d'un ancien installateur Forge.
   const FORGE_JAR = path.join(app.getPath('userData'), `forge-${FORGE_VERSION}-installer.jar`);

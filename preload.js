@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('launcher', {
   on: (channel, cb) => ipcRenderer.on(channel, (_, data) => cb(data)),
   openUrl: (url) => ipcRenderer.send('open-url', url),
   getSiteApi: () => ipcRenderer.invoke('get-site-api'),
+  retryUpdate: () => ipcRenderer.invoke('retry-update'),
   saveCredentials: (username, password) => ipcRenderer.invoke('save-credentials', username, password),
   getAccounts: () => ipcRenderer.invoke('get-accounts'),
   getLastAccount: () => ipcRenderer.invoke('get-last-account'),

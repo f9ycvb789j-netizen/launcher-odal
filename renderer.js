@@ -14,6 +14,14 @@ const rememberMe  = document.getElementById('remember-me');
 const progressBar = document.getElementById('progress-bar');
 const statusText  = document.getElementById('status-text');
 const authZone    = document.getElementById('auth-zone');
+const updateGate = document.getElementById('update-gate');
+const updateGateTitle = document.getElementById('update-gate-title');
+const updateGateMessage = document.getElementById('update-gate-message');
+const updateGateProgress = document.getElementById('update-gate-progress-bar');
+const updateGatePercent = document.getElementById('update-gate-percent');
+const updateGateVersion = document.getElementById('update-gate-version');
+const updateGateRetry = document.getElementById('update-gate-retry');
+const updateGateClose = document.getElementById('update-gate-close');
 
 let isLoggedIn  = false;
 let currentView = 'login'; // 'login' | 'register'
@@ -403,22 +411,55 @@ document.getElementById('reg-confirm').addEventListener('keydown', (e) => {
 });
 
 window.launcher.on('update-status', ({ status, version, progress, path: dmgPath, message }) => {
-  const banner = document.getElementById('update-banner');
-  const text   = document.getElementById('update-text');
-  banner.style.display = 'flex';
-  document.getElementById('update-btn').style.display = 'none';
+  updateGate.classList.remove('hidden');
+  updateGateRetry.classList.remove('visible');
+  updateGateClose.classList.remove('visible');
+  updateGateRetry.disabled = false;
 
-  if (status === 'downloading') {
-    text.textContent = `Mise à jour v${version} en cours de téléchargement...`;
+  if (status === 'checking') {
+    updateGateTitle.textContent = 'Vérification';
+    updateGateMessage.textContent = 'Recherche de la dernière version du launcher Odal…';
+    updateGateProgress.style.width = '7%';
+    updateGatePercent.textContent = 'CONNEXION…';
+    updateGateVersion.textContent = 'ODAL LAUNCHER';
+  } else if (status === 'downloading') {
+    updateGateTitle.textContent = 'Mise à jour';
+    updateGateMessage.textContent = `Téléchargement de la version ${version}. Le launcher sera disponible une fois terminé.`;
+    updateGateProgress.style.width = '10%';
+    updateGatePercent.textContent = '0%';
+    updateGateVersion.textContent = `VERSION ${version}`;
   } else if (status === 'progress') {
-    text.textContent = `Mise à jour : ${progress}%`;
+    const percent = Math.max(0, Math.min(100, Number(progress) || 0));
+    updateGateProgress.style.width = `${percent}%`;
+    updateGatePercent.textContent = `${percent}%`;
+  } else if (status === 'up-to-date') {
+    updateGateTitle.textContent = 'Launcher à jour';
+    updateGateMessage.textContent = 'Tout est prêt. Ouverture du launcher…';
+    updateGateProgress.style.width = '100%';
+    updateGatePercent.textContent = '100%';
+    updateGateVersion.textContent = `VERSION ${version}`;
+    setTimeout(() => updateGate.classList.add('hidden'), 550);
   } else if (status === 'mac-ready') {
-    text.textContent = 'Mise à jour téléchargée — installe le DMG qui vient de s\'ouvrir, puis relance.';
+    updateGateTitle.textContent = 'Installation requise';
+    updateGateMessage.textContent = 'Le fichier DMG est ouvert. Glisse Odal Launcher dans Applications, puis relance le launcher.';
+    updateGateProgress.style.width = '100%';
+    updateGatePercent.textContent = 'TÉLÉCHARGÉ';
+    updateGateClose.classList.add('visible');
   } else if (status === 'error') {
-    text.textContent = message || 'Mise à jour indisponible pour le moment.';
-    setTimeout(() => { banner.style.display = 'none'; }, 6000);
+    updateGateTitle.textContent = 'Connexion impossible';
+    updateGateMessage.textContent = message || 'Impossible de vérifier la mise à jour.';
+    updateGateProgress.style.width = '0%';
+    updateGatePercent.textContent = 'RÉESSAYE POUR CONTINUER';
+    updateGateRetry.classList.add('visible');
+    updateGateClose.classList.add('visible');
   }
 });
+
+updateGateRetry.addEventListener('click', async () => {
+  updateGateRetry.disabled = true;
+  await window.launcher.retryUpdate();
+});
+updateGateClose.addEventListener('click', () => window.launcher.close());
 
 window.launcher.on('progress', (val) => setProgress(val));
 window.launcher.on('status',   (msg) => setStatus(msg));
