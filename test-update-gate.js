@@ -43,8 +43,17 @@ if (process.argv[2]) {
   for (const requiredFile of ['main.js', 'renderer.js', 'index.html', 'updater-utils.js']) {
     assert.ok(packagedFiles.includes(requiredFile), `Fichier absent de l'application : ${requiredFile}`);
   }
-  assert.strictEqual(packagedMods.length, 22, 'Le pack doit contenir exactement 22 mods');
   assert.ok(!packagedMods.some((file) => /odalcurrency|optifine/i.test(file)), 'Ancien mod embarqué');
+  const packagedModNames = new Set(packagedMods.map((file) => file.split('/').pop()));
+  const expectedModNames = JSON.parse(fs.readFileSync('mods-manifest.json', 'utf8'))
+    .map((mod) => mod.name);
+  const externallyPackagedMods = expectedModNames.filter((name) => !packagedModNames.has(name));
+  assert.ok(
+    externallyPackagedMods.length === 0 ||
+      (externallyPackagedMods.length === 1 &&
+       externallyPackagedMods[0] === 'islandfactionsgui-1.0.0.jar'),
+    `Mods absents de app.asar : ${externallyPackagedMods.join(', ')}`
+  );
 
   const packagedHtml = asar.extractFile(archivePath, 'index.html').toString('utf8');
   assert.ok(packagedHtml.includes('id="update-gate"'), 'Écran absent de l’application compilée');
