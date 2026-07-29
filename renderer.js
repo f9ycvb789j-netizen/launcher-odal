@@ -1,6 +1,9 @@
 const btnMin    = document.getElementById('btn-min');
 const btnClose  = document.getElementById('btn-close');
-const btnWebsite = document.getElementById('btn-website');
+const btnSocialSite = document.getElementById('btn-social-site');
+const btnSocialX = document.getElementById('btn-social-x');
+const btnSocialInstagram = document.getElementById('btn-social-instagram');
+const btnSocialDiscord = document.getElementById('btn-social-discord');
 const btnSettings   = document.getElementById('btn-settings');
 const settingsOverlay = document.getElementById('settings-overlay');
 const settingsClose = document.getElementById('settings-close');
@@ -327,7 +330,10 @@ window.switchAuth = switchAuth;
 
 btnMin.addEventListener('click', () => window.launcher.minimize());
 btnClose.addEventListener('click', () => window.launcher.close());
-btnWebsite.addEventListener('click', () => window.launcher.openUrl('https://odalmc.fr'));
+btnSocialSite.addEventListener('click', () => window.launcher.openUrl('https://odalmc.fr'));
+btnSocialX.addEventListener('click', () => window.launcher.openUrl('https://x.com'));
+btnSocialInstagram.addEventListener('click', () => window.launcher.openUrl('https://www.instagram.com'));
+btnSocialDiscord.addEventListener('click', () => window.launcher.openUrl('https://discord.com'));
 
 btnJoin.addEventListener('click', async () => {
   if (isLoggedIn && !showAddAccountForm) {
