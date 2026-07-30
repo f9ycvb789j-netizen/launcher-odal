@@ -7,7 +7,7 @@ const { getPlatformMods } = require('./mod-platform');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 const REQUIRED_GUI_MOD_SHA256 = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
 const REQUIRED_GUI_MOD_SHA256_MAC = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
-const EXPECTED_MOD_COUNT = 22;
+const EXPECTED_MOD_COUNT = 23;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -60,8 +60,8 @@ assert.strictEqual(manifest.length, EXPECTED_MOD_COUNT, `Le manifeste doit conte
 assert.ok(manifest.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le mod GUI manque dans le manifeste');
 const windowsMods = getPlatformMods(manifest, 'win32');
 const macMods = getPlatformMods(manifest, 'darwin');
-assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 22 mods');
-assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 22 mods');
+assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 23 mods');
+assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 23 mods');
 for (const restoredName of [
   'embeddium-0.3.31+mc1.20.1.jar',
   'oculus-mc1.20.1-1.8.0 .jar'
