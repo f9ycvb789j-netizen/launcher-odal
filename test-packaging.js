@@ -5,8 +5,8 @@ const path = require('path');
 const { getPlatformMods } = require('./mod-platform');
 
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-const REQUIRED_GUI_MOD_SHA256 = '7306aaff00a03243759a95f30db9e5994bf5f0cb156e50f9e59f6a13ac0ebb17';
-const REQUIRED_GUI_MOD_SHA256_MAC = '7306aaff00a03243759a95f30db9e5994bf5f0cb156e50f9e59f6a13ac0ebb17';
+const REQUIRED_GUI_MOD_SHA256 = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
+const REQUIRED_GUI_MOD_SHA256_MAC = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
 const EXPECTED_MOD_COUNT = 22;
 
 function sha256(file) {

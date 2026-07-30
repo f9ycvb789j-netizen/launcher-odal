@@ -34,12 +34,12 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.33 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.39 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-const REQUIRED_GUI_MOD_SHA256_WINDOWS = '7306aaff00a03243759a95f30db9e5994bf5f0cb156e50f9e59f6a13ac0ebb17';
-const REQUIRED_GUI_MOD_SHA256_MAC = '7306aaff00a03243759a95f30db9e5994bf5f0cb156e50f9e59f6a13ac0ebb17';
+const REQUIRED_GUI_MOD_SHA256_WINDOWS = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
+const REQUIRED_GUI_MOD_SHA256_MAC = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
 
 let mainWindow;
 let currentUser = null;
