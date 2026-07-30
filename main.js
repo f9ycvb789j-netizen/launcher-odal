@@ -5,6 +5,7 @@ const https = require('https');
 const crypto = require('crypto');
 const { isNewerVersion } = require('./updater-utils');
 const { getPlatformMods } = require('./mod-platform');
+const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -421,6 +422,7 @@ ipcMain.handle('launch', async (event) => {
   send(event, 'status', 'Vérification des mods...');
   send(event, 'progress', 45);
   await syncMods(modsDir, event);
+  ensureDistantHorizonsDefault(GAME_DIR);
 
   writeServersDat(GAME_DIR);
 

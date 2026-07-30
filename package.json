@@ -1,6 +1,6 @@
 {
   "name": "launcher-odal",
-  "version": "1.1.40",
+  "version": "1.1.41",
   "description": "Launcher Serveur Odal",
   "main": "main.js",
   "scripts": {
@@ -21,6 +21,7 @@
       "renderer.js",
       "updater-utils.js",
       "mod-platform.js",
+      "distant-horizons-config.js",
       "skinview3d.bundle.js",
       "background.png",
       "mods-manifest.json",
