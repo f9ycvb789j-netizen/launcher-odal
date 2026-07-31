@@ -39,8 +39,8 @@ const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-const REQUIRED_GUI_MOD_SHA256_WINDOWS = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
-const REQUIRED_GUI_MOD_SHA256_MAC = '77dc2df9bda7db21f207fda65b15530f1f92c37148aad4c0a30dbdbbe6ac9018';
+const REQUIRED_GUI_MOD_SHA256_WINDOWS = '34f3c847d4c3222a12c2568f45e24f50e385e3971d7a58c73745e1065e4a244e';
+const REQUIRED_GUI_MOD_SHA256_MAC = '34f3c847d4c3222a12c2568f45e24f50e385e3971d7a58c73745e1065e4a244e';
 
 let mainWindow;
 let currentUser = null;
@@ -605,10 +605,15 @@ async function syncMods(modsDir, event) {
   const packagedPackDir = path.join(process.resourcesPath, 'mods-pack');
   const archivedPackDir = path.join(__dirname, 'mods-pack');
   const macPackDir = path.join(process.resourcesPath, 'mods-pack-mac');
-  const guiModSource = path.join(
+  const packagedGuiModSource = path.join(
     process.platform === 'darwin' ? macPackDir : packagedPackDir,
     REQUIRED_GUI_MOD
   );
+  // In development Electron has no packaged resources directory. Fall back to
+  // the project mod pack so the same integrity check remains active locally.
+  const guiModSource = fs.existsSync(packagedGuiModSource)
+    ? packagedGuiModSource
+    : path.join(archivedPackDir, REQUIRED_GUI_MOD);
   const requiredGuiModHash = process.platform === 'darwin' ? REQUIRED_GUI_MOD_SHA256_MAC : REQUIRED_GUI_MOD_SHA256_WINDOWS;
 
   if (!expectedJars.has(REQUIRED_GUI_MOD.toLowerCase()) || !fs.existsSync(guiModSource)) {
