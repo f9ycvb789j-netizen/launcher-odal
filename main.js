@@ -41,8 +41,8 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 // Keep the launcher integrity gate aligned with the GUI distributed in mods-pack.
 // Updating this value makes the launcher replace an older local GUI JAR safely.
-const REQUIRED_GUI_MOD_SHA256_WINDOWS = '2158d3d6e92feaac56ad73c7ba88bb2ed5f4e4edd128f1fa9fed47113c7ed183';
-const REQUIRED_GUI_MOD_SHA256_MAC = '2158d3d6e92feaac56ad73c7ba88bb2ed5f4e4edd128f1fa9fed47113c7ed183';
+const REQUIRED_GUI_MOD_SHA256_WINDOWS = '96a5eece1c1b1a415961c5b3e4ebdc41b8a051bcaab0ee21d9d967f7dd798984';
+const REQUIRED_GUI_MOD_SHA256_MAC = '96a5eece1c1b1a415961c5b3e4ebdc41b8a051bcaab0ee21d9d967f7dd798984';
 
 let mainWindow;
 let currentUser = null;

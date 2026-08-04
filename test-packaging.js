@@ -7,8 +7,8 @@ const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
 
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-const REQUIRED_GUI_MOD_SHA256 = '2158d3d6e92feaac56ad73c7ba88bb2ed5f4e4edd128f1fa9fed47113c7ed183';
-const REQUIRED_GUI_MOD_SHA256_MAC = '2158d3d6e92feaac56ad73c7ba88bb2ed5f4e4edd128f1fa9fed47113c7ed183';
+const REQUIRED_GUI_MOD_SHA256 = '96a5eece1c1b1a415961c5b3e4ebdc41b8a051bcaab0ee21d9d967f7dd798984';
+const REQUIRED_GUI_MOD_SHA256_MAC = '96a5eece1c1b1a415961c5b3e4ebdc41b8a051bcaab0ee21d9d967f7dd798984';
 const EXPECTED_MOD_COUNT = 24;
 
 function sha256(file) {
