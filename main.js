@@ -35,7 +35,7 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.39 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.47 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
@@ -580,6 +580,13 @@ function writeServersDat(gameDir) {
     buf.writeUInt16BE(vb.length, o); o += 2;
     vb.copy(buf, o); o += vb.length;
   };
+  const byte = (name, val) => {
+    const nb = Buffer.from(name, 'utf8');
+    buf[o++] = 1;
+    buf.writeUInt16BE(nb.length, o); o += 2;
+    nb.copy(buf, o); o += nb.length;
+    buf.writeInt8(val, o); o += 1;
+  };
   buf[o++] = 10; buf.writeUInt16BE(0, o); o += 2;
   buf[o++] = 9;
   const listName = Buffer.from('servers', 'utf8');
@@ -589,6 +596,10 @@ function writeServersDat(gameDir) {
   buf.writeInt32BE(1, o); o += 4;
   str('ip', SERVER_IP);
   str('name', 'Odal');
+  // Le pack Odal est obligatoire et provient de notre propre serveur. En
+  // enregistrant ce choix dans servers.dat, Minecraft le telecharge sans
+  // afficher l'ecran de confirmation a chaque installation du launcher.
+  byte('acceptTextures', 1);
   buf[o++] = 0;
   buf[o++] = 0;
   fs.writeFileSync(dest, buf.slice(0, o));
