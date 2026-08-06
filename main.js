@@ -35,14 +35,45 @@ const SERVER_PORT = 25565;
 const FORGE_VERSION = '1.20.1-47.4.18';
 const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.49 Chrome/124.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.50 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
+const IS_LOCAL_DEVELOPMENT = !app.isPackaged;
 const GAME_DIR = path.join(app.getPath('appData'), '.odal');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 // Keep the launcher integrity gate aligned with the GUI distributed in mods-pack.
 // Updating this value makes the launcher replace an older local GUI JAR safely.
 const REQUIRED_GUI_MOD_SHA256_WINDOWS = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
 const REQUIRED_GUI_MOD_SHA256_MAC = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
+const REQUIRED_COMPANION_MOD = 'odalcompanion-0.17.4.jar';
+const REQUIRED_COMPANION_MOD_SHA256 = '2e20816f8b6d6ecd433f9d3180abf0eed5cd7cb9e366bad23884c3f5a48b61b0';
+const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
+const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
+
+function logToFile(scope, value) {
+  try {
+    fs.mkdirSync(LAUNCHER_LOG_DIR, { recursive: true });
+    const message = value instanceof Error ? (value.stack || value.message) : String(value);
+    fs.appendFile(
+      LAUNCHER_LOG_FILE,
+      `[${new Date().toISOString()}] [${scope}] ${message}${message.endsWith('\n') ? '' : '\n'}`,
+      () => {}
+    );
+  } catch (_) {
+    // La journalisation ne doit jamais interrompre le launcher.
+  }
+}
+
+logToFile('BOOT_SOURCE', `dirname=${__dirname}; packaged=${app.isPackaged}; version=${CURRENT_VERSION}`);
+
+// Electron peut etre lance sans console. Ignorer un tube stdout/stderr ferme
+// evite qu'un simple message de diagnostic fasse planter le processus principal.
+for (const stream of [process.stdout, process.stderr]) {
+  if (stream && typeof stream.on === 'function') {
+    stream.on('error', (error) => {
+      if (!error || error.code !== 'EPIPE') logToFile('STREAM', error);
+    });
+  }
+}
 
 let mainWindow;
 let currentUser = null;
@@ -67,6 +98,19 @@ async function checkForUpdates() {
   updateCheckInProgress = true;
   updateGateOpen = true;
   mainWindow.webContents.send('update-status', { status: 'checking' });
+
+  // A local development launch must keep the files from this workspace.
+  // Installing the public launcher over Electron's development executable
+  // silently restored the older bundled companion before Minecraft started.
+  if (IS_LOCAL_DEVELOPMENT) {
+    updateGateOpen = false;
+    updateCheckInProgress = false;
+    mainWindow.webContents.send('update-status', {
+      status: 'up-to-date',
+      version: `${CURRENT_VERSION} local`
+    });
+    return;
+  }
 
   try {
     const data = await httpsGet(`https://${SITE_API}/version.json`);
@@ -140,7 +184,7 @@ async function checkForUpdates() {
       shell.openPath(tmpDmg);
     }
   } catch(e) {
-    console.error('Update error:', e);
+    logToFile('UPDATE', e);
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('update-status', {
         status: 'error',
@@ -446,7 +490,7 @@ ipcMain.handle('launch', async (event) => {
   });
 
   launcher.on('data', (data) => {
-    console.log(data);
+    logToFile('MINECRAFT', data);
   });
 
   const auth = currentUser ? Authenticator.getAuth(currentUser.username) : Authenticator.getAuth('Joueur');
@@ -607,6 +651,7 @@ function writeServersDat(gameDir) {
 
 async function syncMods(modsDir, event) {
   const manifest = path.join(__dirname, 'mods-manifest.json');
+  logToFile('MOD_SOURCE', `manifest=${manifest}; modsDir=${modsDir}`);
   if (!fs.existsSync(manifest)) return;
 
   const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
@@ -628,6 +673,8 @@ async function syncMods(modsDir, event) {
     ? packagedGuiModSource
     : path.join(archivedPackDir, REQUIRED_GUI_MOD);
   const requiredGuiModHash = process.platform === 'darwin' ? REQUIRED_GUI_MOD_SHA256_MAC : REQUIRED_GUI_MOD_SHA256_WINDOWS;
+  const companionModSource = path.join(archivedPackDir, REQUIRED_COMPANION_MOD);
+  logToFile('COMPANION_SOURCE', companionModSource);
 
   if (!expectedJars.has(REQUIRED_GUI_MOD.toLowerCase()) || !fs.existsSync(guiModSource)) {
     throw new Error(`Le mod obligatoire ${REQUIRED_GUI_MOD} manque dans le launcher`);
@@ -637,6 +684,15 @@ async function syncMods(modsDir, event) {
     .digest('hex');
   if (guiModHash !== requiredGuiModHash) {
     throw new Error(`La version embarquée de ${REQUIRED_GUI_MOD} est incorrecte`);
+  }
+  if (!expectedJars.has(REQUIRED_COMPANION_MOD.toLowerCase()) || !fs.existsSync(companionModSource)) {
+    throw new Error(`Le mod obligatoire ${REQUIRED_COMPANION_MOD} manque dans le launcher`);
+  }
+  const companionModHash = crypto.createHash('sha256')
+    .update(fs.readFileSync(companionModSource))
+    .digest('hex');
+  if (companionModHash !== REQUIRED_COMPANION_MOD_SHA256) {
+    throw new Error(`La version embarquée de ${REQUIRED_COMPANION_MOD} est incorrecte`);
   }
 
   // Le dossier du launcher est la source de verite : supprimer tout ancien
@@ -685,6 +741,24 @@ async function syncMods(modsDir, event) {
     }
 
     send(event, 'progress', 45 + Math.round(((i + 1) / platformMods.length) * 15));
+  }
+
+  // Dernier contrôle juste avant le lancement du jeu : aucune ancienne
+  // version du compagnon ne doit pouvoir survivre à la synchronisation.
+  for (const file of fs.readdirSync(modsDir)) {
+    const lower = file.toLowerCase();
+    if (lower.startsWith('odalcompanion-') && lower.endsWith('.jar')
+        && lower !== REQUIRED_COMPANION_MOD.toLowerCase()) {
+      fs.unlinkSync(path.join(modsDir, file));
+    }
+  }
+  const companionDest = path.join(modsDir, REQUIRED_COMPANION_MOD);
+  const installedCompanionHash = fs.existsSync(companionDest)
+    ? crypto.createHash('sha256').update(fs.readFileSync(companionDest)).digest('hex')
+    : '';
+  if (installedCompanionHash !== REQUIRED_COMPANION_MOD_SHA256) {
+    send(event, 'status', `Mise à jour obligatoire : ${REQUIRED_COMPANION_MOD}`);
+    fs.copyFileSync(companionModSource, companionDest);
   }
 }
 
