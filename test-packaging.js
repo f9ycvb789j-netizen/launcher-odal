@@ -9,7 +9,7 @@ const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 const REQUIRED_GUI_MOD_SHA256 = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
 const REQUIRED_GUI_MOD_SHA256_MAC = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
-const EXPECTED_MOD_COUNT = 24;
+const EXPECTED_MOD_COUNT = 25;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -66,8 +66,8 @@ assert.strictEqual(manifest.length, EXPECTED_MOD_COUNT, `Le manifeste doit conte
 assert.ok(manifest.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le mod GUI manque dans le manifeste');
 const windowsMods = getPlatformMods(manifest, 'win32');
 const macMods = getPlatformMods(manifest, 'darwin');
-assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 24 mods');
-assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 24 mods');
+assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 25 mods');
+assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 25 mods');
 for (const restoredName of [
   'embeddium-0.3.31+mc1.20.1.jar',
   'oculus-mc1.20.1-1.8.0 .jar'
