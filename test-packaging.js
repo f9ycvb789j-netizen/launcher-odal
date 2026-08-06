@@ -68,9 +68,10 @@ const windowsMods = getPlatformMods(manifest, 'win32');
 const macMods = getPlatformMods(manifest, 'darwin');
 assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 26 mods');
 assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 26 mods');
-assert.ok(manifest.some((mod) => mod.name === 'odalairways-0.4.0.jar'), 'Odal Airways 0.4.0 manque');
-assert.ok(manifest.some((mod) => mod.name === 'odalcompanion-0.14.0.jar'), 'Odal Companion 0.14.0 manque');
-assert.ok(!manifest.some((mod) => mod.name === 'odalcompanion-0.9.1.jar'), 'Odal Companion 0.9.1 doit être retiré');
+assert.ok(manifest.some((mod) => mod.name === 'odalairways-0.5.1.jar'), 'Odal Airways 0.5.1 manque');
+assert.ok(manifest.some((mod) => mod.name === 'odalcompanion-0.16.0.jar'), 'Odal Companion 0.16.0 manque');
+assert.ok(!manifest.some((mod) => mod.name === 'odalairways-0.4.0.jar'), 'Odal Airways 0.4.0 doit être retiré');
+assert.ok(!manifest.some((mod) => mod.name === 'odalcompanion-0.14.0.jar'), 'Odal Companion 0.14.0 doit être retiré');
 for (const restoredName of [
   'embeddium-0.3.31+mc1.20.1.jar',
   'oculus-mc1.20.1-1.8.0 .jar'
