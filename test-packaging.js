@@ -9,8 +9,8 @@ const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 const REQUIRED_GUI_MOD_SHA256 = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
 const REQUIRED_GUI_MOD_SHA256_MAC = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
-const REQUIRED_COMPANION_MOD = 'odalcompanion-0.17.4.jar';
-const REQUIRED_COMPANION_MOD_SHA256 = '2e20816f8b6d6ecd433f9d3180abf0eed5cd7cb9e366bad23884c3f5a48b61b0';
+const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
+const REQUIRED_COMPANION_MOD_SHA256 = 'ad6a4496cbb630c50c17eed050cdd8d3847f11d1ef16d118ee3f129f3a488f95';
 const EXPECTED_MOD_COUNT = 26;
 
 function sha256(file) {
@@ -78,7 +78,7 @@ const macMods = getPlatformMods(manifest, 'darwin');
 assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 26 mods');
 assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 26 mods');
 assert.ok(manifest.some((mod) => mod.name === 'odalairways-0.5.1.jar'), 'Odal Airways 0.5.1 manque');
-assert.ok(manifest.some((mod) => mod.name === 'odalcompanion-0.17.4.jar'), 'Odal Companion 0.17.4 manque');
+assert.ok(manifest.some((mod) => mod.name === 'odalcompanion-0.19.4.jar'), 'Odal Companion 0.19.4 manque');
 assert.ok(!manifest.some((mod) => mod.name === 'odalairways-0.4.0.jar'), 'Odal Airways 0.4.0 doit être retiré');
 assert.ok(!manifest.some((mod) => /odalcompanion-(?:0\.14\.0|0\.16\.0)\.jar/i.test(mod.name)), 'Les anciennes versions d\'Odal Companion doivent etre retirees');
 for (const restoredName of [

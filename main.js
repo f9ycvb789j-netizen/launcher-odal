@@ -44,8 +44,8 @@ const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 // Updating this value makes the launcher replace an older local GUI JAR safely.
 const REQUIRED_GUI_MOD_SHA256_WINDOWS = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
 const REQUIRED_GUI_MOD_SHA256_MAC = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
-const REQUIRED_COMPANION_MOD = 'odalcompanion-0.17.4.jar';
-const REQUIRED_COMPANION_MOD_SHA256 = '2e20816f8b6d6ecd433f9d3180abf0eed5cd7cb9e366bad23884c3f5a48b61b0';
+const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
+const REQUIRED_COMPANION_MOD_SHA256 = 'ad6a4496cbb630c50c17eed050cdd8d3847f11d1ef16d118ee3f129f3a488f95';
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
 
@@ -655,7 +655,24 @@ async function syncMods(modsDir, event) {
   if (!fs.existsSync(manifest)) return;
 
   const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
-  const platformMods = getPlatformMods(mods);
+  // Development-only override: test a local unpublished companion JAR without
+  // adding licensed model assets to the launcher's distributable mods-pack.
+  const developmentCompanionPath = !app.isPackaged
+    ? (process.env.ODAL_COMPANION_DEV_JAR || '')
+    : '';
+  const useDevelopmentCompanion = developmentCompanionPath
+    && fs.existsSync(developmentCompanionPath);
+  const requiredCompanionMod = useDevelopmentCompanion
+    ? path.basename(developmentCompanionPath)
+    : REQUIRED_COMPANION_MOD;
+  const requiredCompanionHash = useDevelopmentCompanion
+    ? crypto.createHash('sha256').update(fs.readFileSync(developmentCompanionPath)).digest('hex')
+    : REQUIRED_COMPANION_MOD_SHA256;
+  const platformMods = getPlatformMods(mods).map((mod) =>
+    mod.name === REQUIRED_COMPANION_MOD
+      ? { ...mod, name: requiredCompanionMod }
+      : mod
+  );
   const expectedJars = new Set(platformMods.map((mod) => mod.name.toLowerCase()));
   // Le mod GUI est aussi livré comme ressource externe à app.asar afin que sa
   // copie soit fiable sur macOS. Les autres mods restent disponibles dans
@@ -673,7 +690,9 @@ async function syncMods(modsDir, event) {
     ? packagedGuiModSource
     : path.join(archivedPackDir, REQUIRED_GUI_MOD);
   const requiredGuiModHash = process.platform === 'darwin' ? REQUIRED_GUI_MOD_SHA256_MAC : REQUIRED_GUI_MOD_SHA256_WINDOWS;
-  const companionModSource = path.join(archivedPackDir, REQUIRED_COMPANION_MOD);
+  const companionModSource = useDevelopmentCompanion
+    ? developmentCompanionPath
+    : path.join(archivedPackDir, REQUIRED_COMPANION_MOD);
   logToFile('COMPANION_SOURCE', companionModSource);
 
   if (!expectedJars.has(REQUIRED_GUI_MOD.toLowerCase()) || !fs.existsSync(guiModSource)) {
@@ -685,14 +704,14 @@ async function syncMods(modsDir, event) {
   if (guiModHash !== requiredGuiModHash) {
     throw new Error(`La version embarquée de ${REQUIRED_GUI_MOD} est incorrecte`);
   }
-  if (!expectedJars.has(REQUIRED_COMPANION_MOD.toLowerCase()) || !fs.existsSync(companionModSource)) {
-    throw new Error(`Le mod obligatoire ${REQUIRED_COMPANION_MOD} manque dans le launcher`);
+  if (!expectedJars.has(requiredCompanionMod.toLowerCase()) || !fs.existsSync(companionModSource)) {
+    throw new Error(`Le mod obligatoire ${requiredCompanionMod} manque dans le launcher`);
   }
   const companionModHash = crypto.createHash('sha256')
     .update(fs.readFileSync(companionModSource))
     .digest('hex');
-  if (companionModHash !== REQUIRED_COMPANION_MOD_SHA256) {
-    throw new Error(`La version embarquée de ${REQUIRED_COMPANION_MOD} est incorrecte`);
+  if (companionModHash !== requiredCompanionHash) {
+    throw new Error(`La version embarquée de ${requiredCompanionMod} est incorrecte`);
   }
 
   // Le dossier du launcher est la source de verite : supprimer tout ancien
@@ -748,16 +767,16 @@ async function syncMods(modsDir, event) {
   for (const file of fs.readdirSync(modsDir)) {
     const lower = file.toLowerCase();
     if (lower.startsWith('odalcompanion-') && lower.endsWith('.jar')
-        && lower !== REQUIRED_COMPANION_MOD.toLowerCase()) {
+        && lower !== requiredCompanionMod.toLowerCase()) {
       fs.unlinkSync(path.join(modsDir, file));
     }
   }
-  const companionDest = path.join(modsDir, REQUIRED_COMPANION_MOD);
+  const companionDest = path.join(modsDir, requiredCompanionMod);
   const installedCompanionHash = fs.existsSync(companionDest)
     ? crypto.createHash('sha256').update(fs.readFileSync(companionDest)).digest('hex')
     : '';
-  if (installedCompanionHash !== REQUIRED_COMPANION_MOD_SHA256) {
-    send(event, 'status', `Mise à jour obligatoire : ${REQUIRED_COMPANION_MOD}`);
+  if (installedCompanionHash !== requiredCompanionHash) {
+    send(event, 'status', `Mise à jour obligatoire : ${requiredCompanionMod}`);
     fs.copyFileSync(companionModSource, companionDest);
   }
 }
