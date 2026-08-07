@@ -2,3 +2,10 @@ node_modules/
 dist/
 forge-installer.jar
 *.log
+
+# Artefacts de build locaux : 1 Go que "git add -A" de Publier.bat
+# embarquerait sinon dans le depot public.
+backups/
+dist-domain-info/
+release-*/
+icon-large-preview*.png
