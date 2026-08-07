@@ -7,8 +7,20 @@ const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
 
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-const REQUIRED_GUI_MOD_SHA256 = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
-const REQUIRED_GUI_MOD_SHA256_MAC = '4bac8468fefd84be9c74b87c4751a75e13cc2ac35bb69ca19526fb7218732ce4';
+
+// L'empreinte attendue est lue dans main.js plutot que recopiee ici. Ce qui doit
+// etre garanti, c'est que la porte d'integrite du launcher et le JAR embarque
+// concordent : une troisieme copie ne verifiait pas cela, elle ajoutait juste un
+// endroit de plus a mettre a jour -- et un oubli cassait le build.
+function guiHashFromMain(constantName) {
+  const source = fs.readFileSync(path.join(__dirname, 'main.js'), 'utf8');
+  const match = new RegExp(`${constantName}\\s*=\\s*'([a-f0-9]{64})'`).exec(source);
+  assert.ok(match, `Constante ${constantName} introuvable dans main.js`);
+  return match[1];
+}
+
+const REQUIRED_GUI_MOD_SHA256 = guiHashFromMain('REQUIRED_GUI_MOD_SHA256_WINDOWS');
+const REQUIRED_GUI_MOD_SHA256_MAC = guiHashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
 const REQUIRED_COMPANION_MOD_SHA256 = 'ad6a4496cbb630c50c17eed050cdd8d3847f11d1ef16d118ee3f129f3a488f95';
 const EXPECTED_MOD_COUNT = 26;
