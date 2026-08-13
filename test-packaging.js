@@ -23,7 +23,7 @@ const REQUIRED_GUI_MOD_SHA256 = guiHashFromMain('REQUIRED_GUI_MOD_SHA256_WINDOWS
 const REQUIRED_GUI_MOD_SHA256_MAC = guiHashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
 const REQUIRED_COMPANION_MOD_SHA256 = 'ad6a4496cbb630c50c17eed050cdd8d3847f11d1ef16d118ee3f129f3a488f95';
-const EXPECTED_MOD_COUNT = 26;
+const EXPECTED_MOD_COUNT = 28;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -87,8 +87,8 @@ assert.strictEqual(manifest.length, EXPECTED_MOD_COUNT, `Le manifeste doit conte
 assert.ok(manifest.some((mod) => mod.name === REQUIRED_GUI_MOD), 'Le mod GUI manque dans le manifeste');
 const windowsMods = getPlatformMods(manifest, 'win32');
 const macMods = getPlatformMods(manifest, 'darwin');
-assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, 'Windows doit garder les 26 mods');
-assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, 'Mac doit contenir les 26 mods');
+assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, `Windows doit garder les ${EXPECTED_MOD_COUNT} mods`);
+assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, `Mac doit contenir les ${EXPECTED_MOD_COUNT} mods`);
 assert.ok(manifest.some((mod) => mod.name === 'odalairways-0.5.1.jar'), 'Odal Airways 0.5.1 manque');
 assert.ok(manifest.some((mod) => mod.name === 'odalcompanion-0.19.4.jar'), 'Odal Companion 0.19.4 manque');
 assert.ok(!manifest.some((mod) => mod.name === 'odalairways-0.4.0.jar'), 'Odal Airways 0.4.0 doit être retiré');
