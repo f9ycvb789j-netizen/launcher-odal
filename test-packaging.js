@@ -12,17 +12,17 @@ const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 // etre garanti, c'est que la porte d'integrite du launcher et le JAR embarque
 // concordent : une troisieme copie ne verifiait pas cela, elle ajoutait juste un
 // endroit de plus a mettre a jour -- et un oubli cassait le build.
-function guiHashFromMain(constantName) {
+function hashFromMain(constantName) {
   const source = fs.readFileSync(path.join(__dirname, 'main.js'), 'utf8');
   const match = new RegExp(`${constantName}\\s*=\\s*'([a-f0-9]{64})'`).exec(source);
   assert.ok(match, `Constante ${constantName} introuvable dans main.js`);
   return match[1];
 }
 
-const REQUIRED_GUI_MOD_SHA256 = guiHashFromMain('REQUIRED_GUI_MOD_SHA256_WINDOWS');
-const REQUIRED_GUI_MOD_SHA256_MAC = guiHashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
+const REQUIRED_GUI_MOD_SHA256 = hashFromMain('REQUIRED_GUI_MOD_SHA256_WINDOWS');
+const REQUIRED_GUI_MOD_SHA256_MAC = hashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
-const REQUIRED_COMPANION_MOD_SHA256 = 'ad6a4496cbb630c50c17eed050cdd8d3847f11d1ef16d118ee3f129f3a488f95';
+const REQUIRED_COMPANION_MOD_SHA256 = hashFromMain('REQUIRED_COMPANION_MOD_SHA256');
 const EXPECTED_MOD_COUNT = 28;
 
 function sha256(file) {
