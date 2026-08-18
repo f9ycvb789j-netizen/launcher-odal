@@ -26,5 +26,6 @@
   { "name": "xaerominimap-forge-1.20.1-26.1.0.jar",         "url": "URL_A_REMPLIR" },
   { "name": "xaeroworldmap-forge-1.20.1-1.41.2.jar",        "url": "URL_A_REMPLIR" },
   { "name": "odaldrapeau-1.0.0.jar",                      "url": "URL_A_REMPLIR" },
-  { "name": "odalmaquette-1.0.0.jar",                     "url": "URL_A_REMPLIR" }
+  { "name": "odalmaquette-1.0.0.jar",                     "url": "URL_A_REMPLIR" },
+  { "name": "punchy-2.7c-forge-1.20.1.jar",               "url": "https://cdn.modrinth.com/data/8aoMKplv/versions/XqtbjmO7/punchy-2.7c-forge-1.20.1.jar" }
 ]
