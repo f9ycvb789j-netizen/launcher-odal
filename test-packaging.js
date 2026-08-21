@@ -23,7 +23,7 @@ const REQUIRED_GUI_MOD_SHA256 = hashFromMain('REQUIRED_GUI_MOD_SHA256_WINDOWS');
 const REQUIRED_GUI_MOD_SHA256_MAC = hashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
 const REQUIRED_COMPANION_MOD_SHA256 = hashFromMain('REQUIRED_COMPANION_MOD_SHA256');
-const EXPECTED_MOD_COUNT = 32;
+const EXPECTED_MOD_COUNT = 33;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');

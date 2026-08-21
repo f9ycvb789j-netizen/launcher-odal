@@ -30,5 +30,6 @@
   { "name": "voicechat-forge-1.20.1-2.6.21.jar",                 "url": "URL_A_REMPLIR" },
   { "name": "xaerominimap-forge-1.20.1-26.1.0.jar",              "url": "URL_A_REMPLIR" },
   { "name": "xaeroworldmap-forge-1.20.1-1.41.2.jar",             "url": "URL_A_REMPLIR" },
+  { "name": "yet_another_config_lib_v3-3.6.6+1.20.1-forge.jar",  "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/sCWgXDYQ/yet_another_config_lib_v3-3.6.6%2B1.20.1-forge.jar" },
   { "name": "yo_hooks-forge-5.0.1.jar",                          "url": "https://cdn.modrinth.com/data/t1p8V2nl/versions/SgsosXAk/yo_hooks-forge-5.0.1.jar" }
 ]
