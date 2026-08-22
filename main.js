@@ -45,8 +45,8 @@ const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 // Updating this value makes the launcher replace an older local GUI JAR safely.
 const REQUIRED_GUI_MOD_SHA256_WINDOWS = '0f3387cc8d941da3ab595e323b961af82572214a4e506422becce72a0ad6c308';
 const REQUIRED_GUI_MOD_SHA256_MAC = '0f3387cc8d941da3ab595e323b961af82572214a4e506422becce72a0ad6c308';
-const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.4.jar';
-const REQUIRED_COMPANION_MOD_SHA256 = '7dd9843dd78d49f64ac494170c3e922d3f8e5395912b59bd80e60068d1375420';
+const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.7.jar';
+const REQUIRED_COMPANION_MOD_SHA256 = '71cb549481105cef6d6511ac7bb80eb1d242c9a8efda1cb0b3b76b1fa717099c';
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
 
