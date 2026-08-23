@@ -142,4 +142,20 @@ if (process.argv[2]) {
   verifyMacGuiMod(path.join(path.resolve(process.argv[2]), 'mods-pack-mac', REQUIRED_GUI_MOD));
 }
 
+// Chaque module local requis par main.js doit figurer dans build.files.
+// electron-builder n'embarque que cette liste : un fichier oublie passe la
+// compilation sans bruit, puis le launcher meurt au demarrage sur
+// "Cannot find module". C'est arrive avec custom-skin-loader-config.js en
+// 1.1.67, chez tous les joueurs qui avaient deja pris la mise a jour.
+const mainSource = fs.readFileSync('main.js', 'utf8');
+const packagedFiles = JSON.parse(fs.readFileSync('package.json', 'utf8')).build.files;
+const localRequires = [...mainSource.matchAll(/require\('\.\/([\w.-]+)'\)/g)].map((m) => m[1]);
+for (const dep of localRequires) {
+  const candidats = [dep, `${dep}.js`, `${dep}.json`];
+  assert.ok(
+    candidats.some((c) => packagedFiles.includes(c)),
+    `main.js requiert './${dep}' mais aucun de ${candidats.join(', ')} n'est dans build.files`
+  );
+}
+
 console.log('Packaging des mods : tests réussis');
