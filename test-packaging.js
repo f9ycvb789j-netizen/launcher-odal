@@ -12,6 +12,13 @@ const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 // etre garanti, c'est que la porte d'integrite du launcher et le JAR embarque
 // concordent : une troisieme copie ne verifiait pas cela, elle ajoutait juste un
 // endroit de plus a mettre a jour -- et un oubli cassait le build.
+function nameFromMain(constantName) {
+  const source = fs.readFileSync(path.join(__dirname, 'main.js'), 'utf8');
+  const match = new RegExp(`${constantName}\\s*=\\s*'([^']+\\.jar)'`).exec(source);
+  assert.ok(match, `Constante ${constantName} introuvable dans main.js`);
+  return match[1];
+}
+
 function hashFromMain(constantName) {
   const source = fs.readFileSync(path.join(__dirname, 'main.js'), 'utf8');
   const match = new RegExp(`${constantName}\\s*=\\s*'([a-f0-9]{64})'`).exec(source);
@@ -21,7 +28,9 @@ function hashFromMain(constantName) {
 
 const REQUIRED_GUI_MOD_SHA256 = hashFromMain('REQUIRED_GUI_MOD_SHA256_WINDOWS');
 const REQUIRED_GUI_MOD_SHA256_MAC = hashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
-const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.7.jar';
+// Le nom du JAR est lu dans main.js, comme son empreinte : la version du compagnon
+// change a chaque publication, et une copie de plus etait une occasion d'oubli.
+const REQUIRED_COMPANION_MOD = nameFromMain('REQUIRED_COMPANION_MOD');
 const REQUIRED_COMPANION_MOD_SHA256 = hashFromMain('REQUIRED_COMPANION_MOD_SHA256');
 const EXPECTED_MOD_COUNT = 34;
 
@@ -90,7 +99,8 @@ const macMods = getPlatformMods(manifest, 'darwin');
 assert.strictEqual(windowsMods.length, EXPECTED_MOD_COUNT, `Windows doit garder les ${EXPECTED_MOD_COUNT} mods`);
 assert.strictEqual(macMods.length, EXPECTED_MOD_COUNT, `Mac doit contenir les ${EXPECTED_MOD_COUNT} mods`);
 assert.ok(manifest.some((mod) => mod.name === 'odalairways-0.5.1.jar'), 'Odal Airways 0.5.1 manque');
-assert.ok(manifest.some((mod) => mod.name === 'odalcompanion-0.19.7.jar'), 'Odal Companion 0.19.7 manque');
+assert.ok(manifest.some((mod) => mod.name === REQUIRED_COMPANION_MOD),
+    `${REQUIRED_COMPANION_MOD} manque au manifeste`);
 assert.ok(manifest.some((mod) => mod.name === 'punchy-2.7c-forge-1.20.1.jar'), 'Le mod Punchy manque');
 assert.ok(!manifest.some((mod) => mod.name === 'odalairways-0.4.0.jar'), 'Odal Airways 0.4.0 doit être retiré');
 assert.ok(!manifest.some((mod) => /odalcompanion-(?:0\.14\.0|0\.16\.0)\.jar/i.test(mod.name)), 'Les anciennes versions d\'Odal Companion doivent etre retirees');
