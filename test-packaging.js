@@ -33,7 +33,7 @@ const REQUIRED_GUI_MOD_SHA256_MAC = hashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 // change a chaque publication, et une copie de plus etait une occasion d'oubli.
 const REQUIRED_COMPANION_MOD = nameFromMain('REQUIRED_COMPANION_MOD');
 const REQUIRED_COMPANION_MOD_SHA256 = hashFromMain('REQUIRED_COMPANION_MOD_SHA256');
-const EXPECTED_MOD_COUNT = 41;
+const EXPECTED_MOD_COUNT = 37;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -148,9 +148,10 @@ try {
   fs.rmSync(tempGameDir, { recursive: true, force: true });
 }
 
-// La bascule bettercombatCompat ne concerne que les installations qui existaient
-// avant Better Combat : leur punchy_config.json n'est jamais reecrit, donc sans
-// cette migration ils gardent false et voient chaque coup deux fois.
+// bettercombatCompat a true fait retomber Better Combat sur l'affichage vanilla de
+// l'objet : les coups redeviennent ceux du jeu de base. Comme punchy_config.json
+// n'est jamais reecrit une fois pose, il faut cette bascule pour rattraper les
+// installations qui ont pris la 1.1.75.
 const tempPunchyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'odal-punchy-'));
 try {
   const punchyDir = path.join(tempPunchyDir, 'config', 'punchy');
@@ -158,24 +159,24 @@ try {
   fs.mkdirSync(punchyDir, { recursive: true });
   fs.writeFileSync(
     punchyFile,
-    JSON.stringify({ bettercombatCompat: false, animationSpeed: 3.5 }, null, 2),
+    JSON.stringify({ bettercombatCompat: true, animationSpeed: 3.5 }, null, 2),
     'utf8'
   );
 
   assert.strictEqual(
     ensureBettercombatCompat(tempPunchyDir),
     true,
-    'La compatibilite Better Combat doit etre activee sur une config existante'
+    'La main doit etre rendue a Better Combat sur une config existante'
   );
   const migre = JSON.parse(fs.readFileSync(punchyFile, 'utf8'));
-  assert.strictEqual(migre.bettercombatCompat, true, 'La cle doit passer a true');
+  assert.strictEqual(migre.bettercombatCompat, false, 'La cle doit repasser a false');
   assert.strictEqual(migre.animationSpeed, 3.5, 'Le reste des reglages du joueur doit survivre');
 
-  // Une seule fois : le joueur qui repasse la cle a false depuis l'ecran Punchy
-  // ne doit pas se la voir reactiver au lancement suivant.
+  // Une seule fois : le joueur qui remet la cle a true depuis l'ecran Punchy ne doit
+  // pas se la voir corriger au lancement suivant.
   fs.writeFileSync(
     punchyFile,
-    JSON.stringify({ bettercombatCompat: false, animationSpeed: 3.5 }, null, 2),
+    JSON.stringify({ bettercombatCompat: true, animationSpeed: 3.5 }, null, 2),
     'utf8'
   );
   assert.strictEqual(
@@ -185,7 +186,7 @@ try {
   );
   assert.strictEqual(
     JSON.parse(fs.readFileSync(punchyFile, 'utf8')).bettercombatCompat,
-    false,
+    true,
     'Le choix du joueur doit primer apres la migration'
   );
   assert.ok(

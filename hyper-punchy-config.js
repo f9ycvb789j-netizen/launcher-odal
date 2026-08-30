@@ -89,12 +89,20 @@ function ensurePunchyConfig(gameDir) {
 //
 // ensurePunchyConfig n'ecrit jamais par-dessus une config deja presente, ce qui est
 // la bonne regle : les reglages Punchy appartiennent au joueur. Mais Better Combat
-// est arrive apres coup, et sans cette cle Punchy rejoue ses propres effets de coup
-// par-dessus ceux de Better Combat -- le joueur voit la frappe deux fois.
+// est arrive apres coup, et cette cle decide lequel des deux mods anime la vue a la
+// premiere personne.
 //
-// On ne touche donc qu'a cette cle, une seule fois, tracee par un marqueur : si le
-// joueur la remet ensuite a false depuis l'ecran de config, c'est son choix.
-const BETTERCOMBAT_MARKER = '.odal-bettercombat-compat';
+// Le nom de l'option trompe : a true, Punchy prend la main et appelle
+// applyVanillaItemDisplay sur Better Combat, qui retombe alors sur le balancement
+// vanilla de l'objet -- les coups d'epee redeviennent ceux du jeu de base. A false,
+// c'est Punchy qui s'efface pendant une attaque Better Combat et laisse jouer
+// l'animation propre a l'arme. C'est ce qu'on veut : les vraies animations.
+//
+// La 1.1.75 a livre true, donc le marqueur change de nom pour repasser une fois sur
+// les installations qui l'ont prise. Une seule fois : si le joueur remet la valeur
+// depuis l'ecran de config Punchy, c'est son choix.
+const BETTERCOMBAT_MARKER = '.odal-bettercombat-compat-2';
+const BETTERCOMBAT_COMPAT = false;
 
 function ensureBettercombatCompat(gameDir) {
   const destDir = path.join(gameDir, 'config', 'punchy');
@@ -114,8 +122,8 @@ function ensureBettercombatCompat(gameDir) {
   }
 
   let modifie = false;
-  if (config && typeof config === 'object' && config.bettercombatCompat !== true) {
-    config.bettercombatCompat = true;
+  if (config && typeof config === 'object' && config.bettercombatCompat !== BETTERCOMBAT_COMPAT) {
+    config.bettercombatCompat = BETTERCOMBAT_COMPAT;
     fs.writeFileSync(dest, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
     modifie = true;
   }
