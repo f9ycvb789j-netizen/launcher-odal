@@ -6,7 +6,11 @@ const crypto = require('crypto');
 const { isNewerVersion } = require('./updater-utils');
 const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
-const { ensureHyperPunchyPack, ensurePunchyConfig } = require('./hyper-punchy-config');
+const {
+  ensureHyperPunchyPack,
+  ensurePunchyConfig,
+  ensureBettercombatCompat
+} = require('./hyper-punchy-config');
 const { ensureCustomSkinLoaderConfig } = require('./custom-skin-loader-config');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
@@ -473,6 +477,7 @@ ipcMain.handle('launch', async (event) => {
   ensureDistantHorizonsDefault(GAME_DIR);
   ensureHyperPunchyPack(GAME_DIR);
   ensurePunchyConfig(GAME_DIR);
+  ensureBettercombatCompat(GAME_DIR);
   ensureCustomSkinLoaderConfig(GAME_DIR);
 
   writeServersDat(GAME_DIR);

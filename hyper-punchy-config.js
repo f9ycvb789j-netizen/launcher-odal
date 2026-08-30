@@ -85,9 +85,49 @@ function ensurePunchyConfig(gameDir) {
   return true;
 }
 
+// Bascule ponctuelle de bettercombatCompat sur les installations existantes.
+//
+// ensurePunchyConfig n'ecrit jamais par-dessus une config deja presente, ce qui est
+// la bonne regle : les reglages Punchy appartiennent au joueur. Mais Better Combat
+// est arrive apres coup, et sans cette cle Punchy rejoue ses propres effets de coup
+// par-dessus ceux de Better Combat -- le joueur voit la frappe deux fois.
+//
+// On ne touche donc qu'a cette cle, une seule fois, tracee par un marqueur : si le
+// joueur la remet ensuite a false depuis l'ecran de config, c'est son choix.
+const BETTERCOMBAT_MARKER = '.odal-bettercombat-compat';
+
+function ensureBettercombatCompat(gameDir) {
+  const destDir = path.join(gameDir, 'config', 'punchy');
+  const marker = path.join(destDir, BETTERCOMBAT_MARKER);
+  if (fs.existsSync(marker)) return false;
+
+  const dest = path.join(destDir, 'punchy_config.json');
+  if (!fs.existsSync(dest)) return false;
+
+  let config;
+  try {
+    config = JSON.parse(fs.readFileSync(dest, 'utf8'));
+  } catch (error) {
+    // Config illisible : on n'y touche pas, et on ne pose pas le marqueur non plus
+    // pour retenter au prochain lancement.
+    return false;
+  }
+
+  let modifie = false;
+  if (config && typeof config === 'object' && config.bettercombatCompat !== true) {
+    config.bettercombatCompat = true;
+    fs.writeFileSync(dest, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
+    modifie = true;
+  }
+  fs.writeFileSync(marker, '', 'utf8');
+  return modifie;
+}
+
 module.exports = {
   PACK_FILE,
   PACK_ENTRY,
+  BETTERCOMBAT_MARKER,
   ensureHyperPunchyPack,
-  ensurePunchyConfig
+  ensurePunchyConfig,
+  ensureBettercombatCompat
 };

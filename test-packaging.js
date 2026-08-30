@@ -5,6 +5,7 @@ const os = require('os');
 const path = require('path');
 const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
+const { BETTERCOMBAT_MARKER, ensureBettercombatCompat } = require('./hyper-punchy-config');
 
 const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
 
@@ -32,7 +33,7 @@ const REQUIRED_GUI_MOD_SHA256_MAC = hashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 // change a chaque publication, et une copie de plus etait une occasion d'oubli.
 const REQUIRED_COMPANION_MOD = nameFromMain('REQUIRED_COMPANION_MOD');
 const REQUIRED_COMPANION_MOD_SHA256 = hashFromMain('REQUIRED_COMPANION_MOD_SHA256');
-const EXPECTED_MOD_COUNT = 35;
+const EXPECTED_MOD_COUNT = 41;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -145,6 +146,54 @@ try {
   );
 } finally {
   fs.rmSync(tempGameDir, { recursive: true, force: true });
+}
+
+// La bascule bettercombatCompat ne concerne que les installations qui existaient
+// avant Better Combat : leur punchy_config.json n'est jamais reecrit, donc sans
+// cette migration ils gardent false et voient chaque coup deux fois.
+const tempPunchyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'odal-punchy-'));
+try {
+  const punchyDir = path.join(tempPunchyDir, 'config', 'punchy');
+  const punchyFile = path.join(punchyDir, 'punchy_config.json');
+  fs.mkdirSync(punchyDir, { recursive: true });
+  fs.writeFileSync(
+    punchyFile,
+    JSON.stringify({ bettercombatCompat: false, animationSpeed: 3.5 }, null, 2),
+    'utf8'
+  );
+
+  assert.strictEqual(
+    ensureBettercombatCompat(tempPunchyDir),
+    true,
+    'La compatibilite Better Combat doit etre activee sur une config existante'
+  );
+  const migre = JSON.parse(fs.readFileSync(punchyFile, 'utf8'));
+  assert.strictEqual(migre.bettercombatCompat, true, 'La cle doit passer a true');
+  assert.strictEqual(migre.animationSpeed, 3.5, 'Le reste des reglages du joueur doit survivre');
+
+  // Une seule fois : le joueur qui repasse la cle a false depuis l'ecran Punchy
+  // ne doit pas se la voir reactiver au lancement suivant.
+  fs.writeFileSync(
+    punchyFile,
+    JSON.stringify({ bettercombatCompat: false, animationSpeed: 3.5 }, null, 2),
+    'utf8'
+  );
+  assert.strictEqual(
+    ensureBettercombatCompat(tempPunchyDir),
+    false,
+    'La bascule ne doit jouer qu une fois'
+  );
+  assert.strictEqual(
+    JSON.parse(fs.readFileSync(punchyFile, 'utf8')).bettercombatCompat,
+    false,
+    'Le choix du joueur doit primer apres la migration'
+  );
+  assert.ok(
+    fs.existsSync(path.join(punchyDir, BETTERCOMBAT_MARKER)),
+    'Le marqueur de migration doit etre pose'
+  );
+} finally {
+  fs.rmSync(tempPunchyDir, { recursive: true, force: true });
 }
 
 if (process.argv[2]) {
