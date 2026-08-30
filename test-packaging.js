@@ -33,7 +33,7 @@ const REQUIRED_GUI_MOD_SHA256_MAC = hashFromMain('REQUIRED_GUI_MOD_SHA256_MAC');
 // change a chaque publication, et une copie de plus etait une occasion d'oubli.
 const REQUIRED_COMPANION_MOD = nameFromMain('REQUIRED_COMPANION_MOD');
 const REQUIRED_COMPANION_MOD_SHA256 = hashFromMain('REQUIRED_COMPANION_MOD_SHA256');
-const EXPECTED_MOD_COUNT = 37;
+const EXPECTED_MOD_COUNT = 38;
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
