@@ -68,7 +68,11 @@ jobs:
           path: dist/*.dmg
 
   release:
+    # Le build Mac echoue par intermittence (outillage/signature) : il ne doit
+    # jamais bloquer la publication Windows. Le .dmg de la release precedente
+    # reste en place tant qu'un build Mac n'a pas reussi a nouveau.
     needs: [build-windows, build-mac]
+    if: always() && needs.build-windows.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -80,6 +84,7 @@ jobs:
           path: ./windows
 
       - name: Download Mac build
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: Odal-Launcher-Mac
