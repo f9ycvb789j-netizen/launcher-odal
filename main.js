@@ -58,7 +58,7 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 const REQUIRED_MODS = [
   // OdalCompanion attend son portage 1.21.11 : retire du pack en attendant.
   // 2.2.0 = build Fabric (la 2.1.0 etait le build NeoForge, conserve dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-2.2.0.jar', sha256: '5cf952c1755146b0de560c671929904e83de0fb97fc8916be073afce9c466b8a' },
+  { name: 'islandfactionsgui-2.2.1.jar', sha256: 'd30c817e830073d6f7d5344dd003e16a790f1ee25476a9e3cc2598e53702a35a' },
 ];
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
