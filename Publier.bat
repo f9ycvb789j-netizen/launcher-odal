@@ -2,7 +2,7 @@
 echo Envoi des modifications sur GitHub...
 cd /d "%~dp0"
 git add -A
-git commit -m "Mise a jour launcher"
+git commit -m "Mise a jour launcher Odal"
 git push
 echo.
 echo Termine ! GitHub va recompiler le launcher dans quelques minutes.

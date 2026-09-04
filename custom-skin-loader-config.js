@@ -10,7 +10,7 @@ const path = require('path');
 const SKIN_ROOT = 'https://odalmc.fr/uploads';
 
 const DEFAULT_CONFIG = {
-  version: '14.28',
+  version: '15.0.1',
   loadlist: [
     {
       name: 'Odal',

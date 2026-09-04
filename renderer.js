@@ -447,7 +447,7 @@ window.launcher.on('update-status', ({ status, version, progress, path: dmgPath,
     setTimeout(() => updateGate.classList.add('hidden'), 550);
   } else if (status === 'mac-ready') {
     updateGateTitle.textContent = 'Installation requise';
-    updateGateMessage.textContent = 'Le fichier DMG est ouvert. Glisse Odal Launcher dans Applications, puis relance le launcher.';
+    updateGateMessage.textContent = 'Le fichier DMG est ouvert. Glisse OdalPaper Launcher dans Applications, puis relance le launcher.';
     updateGateProgress.style.width = '100%';
     updateGatePercent.textContent = 'TÉLÉCHARGÉ';
     updateGateClose.classList.add('visible');

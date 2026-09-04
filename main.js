@@ -6,12 +6,9 @@ const crypto = require('crypto');
 const { isNewerVersion } = require('./updater-utils');
 const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
-const {
-  ensureHyperPunchyPack,
-  ensurePunchyConfig,
-  ensureBettercombatCompat
-} = require('./hyper-punchy-config');
+const { ensureShoulderSurfingDefault } = require('./shoulder-surfing-config');
 const { ensureCustomSkinLoaderConfig } = require('./custom-skin-loader-config');
+const { ensureBundledResourcePacks } = require('./resource-packs');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -36,22 +33,33 @@ const { Client, Authenticator } = require('minecraft-launcher-core');
 const { execFile } = require('child_process');
 const { status: mcStatus } = require('minecraft-server-util');
 
-const SERVER_IP = 'odal.minesr.com';
-const SERVER_PORT = 25565;
-const FORGE_VERSION = '1.20.1-47.4.18';
-const FORGE_DOWNLOAD_URL = `https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_VERSION}/forge-${FORGE_VERSION}-installer.jar`;
+// Launcher OdalPaper : serveur Paper 1.21.11 + client Fabric (mods d'interface seulement).
+// Copie independante du launcher Forge 1.20.1 (launcher-odal-propre), qui reste intouche.
+// Fabric plutot que NeoForge : c'est le seul loader ou Distant Horizons accepte Iris
+// (shaders + horizon lointain ensemble), et ou Bobby/Litematica existent en 1.21.11.
+const SERVER_IP = '7022.mystrator.com';
+const SERVER_PORT = 27424;
+const SERVER_LABEL = 'Odal Paper';
+const MINECRAFT_VERSION = '1.21.11';
+const FABRIC_LOADER_VERSION = '0.19.5';
+const FABRIC_PROFILE_URL = `https://meta.fabricmc.net/v2/versions/loader/${MINECRAFT_VERSION}/${FABRIC_LOADER_VERSION}/profile/json`;
 const SITE_API = 'odalmc.fr';
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalLauncher/1.1.50 Chrome/124.0.0.0 Safari/537.36';
+// Fichier de mise a jour distinct : version.json est celui du launcher Forge.
+// Bascule du 04/09/2026 : ce launcher EST la mise a jour 2.0.0 du launcher Odal
+// (meme appId, meme productName) — il lit donc le manifest officiel version.json.
+const UPDATE_MANIFEST = 'version.json';
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) OdalPaperLauncher/0.1.0 Chrome/124.0.0.0 Safari/537.36';
 const CURRENT_VERSION = app.getVersion();
 const IS_LOCAL_DEVELOPMENT = !app.isPackaged;
-const GAME_DIR = path.join(app.getPath('appData'), '.odal');
-const REQUIRED_GUI_MOD = 'islandfactionsgui-1.0.0.jar';
-// Keep the launcher integrity gate aligned with the GUI distributed in mods-pack.
-// Updating this value makes the launcher replace an older local GUI JAR safely.
-const REQUIRED_GUI_MOD_SHA256_WINDOWS = '0a312919ab5ab2d14e049e778f14be10a21851600301e03f6a9fb228711d8209';
-const REQUIRED_GUI_MOD_SHA256_MAC = '0a312919ab5ab2d14e049e778f14be10a21851600301e03f6a9fb228711d8209';
-const REQUIRED_COMPANION_MOD = 'odalcompanion-0.19.10.jar';
-const REQUIRED_COMPANION_MOD_SHA256 = '365388841079f367f8f1069ec4bdf43da1476315f35bc2747b7d88fc8d5b327c';
+const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
+// Mods maison obligatoires, epingles par SHA-256 : le launcher refuse de lancer si le
+// jar embarque ne correspond pas. Vide tant qu'IslandFactionsGUI et OdalCompanion n'ont
+// pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
+const REQUIRED_MODS = [
+  // OdalCompanion attend son portage 1.21.11 : retire du pack en attendant.
+  // 2.2.0 = build Fabric (la 2.1.0 etait le build NeoForge, conserve dans paper/mods-neoforge).
+  { name: 'islandfactionsgui-2.2.0.jar', sha256: '5cf952c1755146b0de560c671929904e83de0fb97fc8916be073afce9c466b8a' },
+];
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
 
@@ -119,7 +127,7 @@ async function checkForUpdates() {
   }
 
   try {
-    const data = await httpsGet(`https://${SITE_API}/version.json`);
+    const data = await httpsGet(`https://${SITE_API}/${UPDATE_MANIFEST}`);
     const remote = JSON.parse(data);
     if (!remote.version || !isNewerVersion(remote.version, CURRENT_VERSION)) {
       updateGateOpen = false;
@@ -134,15 +142,15 @@ async function checkForUpdates() {
     if (process.platform === 'win32') {
       // Windows : télécharge + remplace + relance automatiquement
       const os = require('os');
-      const tmpExe = path.join(os.tmpdir(), 'OdalLauncherUpdate.exe');
+      const tmpExe = path.join(os.tmpdir(), 'OdalPaperLauncherUpdate.exe');
       await downloadWithRetries(url, tmpExe, (p) => {
         mainWindow.webContents.send('update-status', { status: 'progress', progress: Math.round(p * 100) });
       });
 
       const currentExe = process.execPath;
       const installDir = path.dirname(currentExe);
-      const batPath = path.join(os.tmpdir(), 'odal_update.bat');
-      const logPath = path.join(os.tmpdir(), 'odal_update_log.txt');
+      const batPath = path.join(os.tmpdir(), 'odalpaper_update.bat');
+      const logPath = path.join(os.tmpdir(), 'odalpaper_update_log.txt');
       // version.json pointe vers l'installeur NSIS complet, pas un simple exe autonome :
       // il faut l'executer silencieusement (/S) en ciblant le meme dossier (/D=...) pour
       // mettre a jour l'installation existante, plutot que de copier le fichier par-dessus
@@ -182,7 +190,7 @@ async function checkForUpdates() {
     } else {
       // Mac : télécharge le DMG et l'ouvre (installation manuelle requise sans signing)
       const os = require('os');
-      const tmpDmg = path.join(os.tmpdir(), `OdalLauncher-${remote.version}.dmg`);
+      const tmpDmg = path.join(os.tmpdir(), `OdalPaperLauncher-${remote.version}.dmg`);
       await downloadWithRetries(url, tmpDmg, (p) => {
         mainWindow.webContents.send('update-status', { status: 'progress', progress: Math.round(p * 100) });
       });
@@ -441,46 +449,39 @@ ipcMain.handle('launch', async (event) => {
   }
 
   const modsDir = path.join(GAME_DIR, 'mods');
-  // Un nom versionne empeche la reutilisation d'un ancien installateur Forge.
-  const FORGE_JAR = path.join(app.getPath('userData'), `forge-${FORGE_VERSION}-installer.jar`);
-  // MCLC met Forge en cache par version Minecraft. Regenerer ce cache si la
-  // build qu'il contient ne correspond pas a celle exigee par le serveur.
-  const forgeVersionFile = path.join(GAME_DIR, 'forge', '1.20.1', 'version.json');
-  const forgeInstalled = fs.existsSync(forgeVersionFile)
-    && fs.readFileSync(forgeVersionFile, 'utf8').includes(FORGE_VERSION);
-  if (!forgeInstalled && fs.existsSync(forgeVersionFile)) {
-    fs.unlinkSync(forgeVersionFile);
-  }
-
   if (!fs.existsSync(modsDir)) fs.mkdirSync(modsDir, { recursive: true });
 
-  send(event, 'status', 'Vérification de Forge...');
+  send(event, 'status', 'Vérification de Fabric...');
   send(event, 'progress', 5);
 
-  if (!forgeInstalled || !fs.existsSync(FORGE_JAR)) {
-    if (!fs.existsSync(FORGE_JAR)) {
-      send(event, 'status', 'Téléchargement de Forge...');
-      await download(FORGE_DOWNLOAD_URL, FORGE_JAR, (p) => {
-        send(event, 'progress', Math.round(p * 40));
-      });
-    }
-  } else {
-    send(event, 'progress', 40);
-  }
-
-  send(event, 'status', 'Vérification de Java 17...');
-  const javaPath = await ensureJava17(GAME_DIR, event);
+  send(event, 'status', 'Vérification de Java 21...');
+  const javaPath = await ensureJava21(GAME_DIR, event);
 
   send(event, 'status', 'Vérification des mods...');
   send(event, 'progress', 45);
   await syncMods(modsDir, event);
   ensureDistantHorizonsDefault(GAME_DIR);
-  ensureHyperPunchyPack(GAME_DIR);
-  ensurePunchyConfig(GAME_DIR);
-  ensureBettercombatCompat(GAME_DIR);
+  ensureShoulderSurfingDefault(GAME_DIR);
   ensureCustomSkinLoaderConfig(GAME_DIR);
+  ensureBundledResourcePacks(GAME_DIR, path.join(__dirname, 'resourcepacks-pack'));
 
   writeServersDat(GAME_DIR);
+
+  // Fabric n'a pas d'installateur : son profil de version est un simple JSON
+  // servi par meta.fabricmc.net, que MCLC sait lancer en version custom.
+  const FABRIC_PROFILE = `fabric-loader-${FABRIC_LOADER_VERSION}-${MINECRAFT_VERSION}`;
+  const profileJson = path.join(GAME_DIR, 'versions', FABRIC_PROFILE, `${FABRIC_PROFILE}.json`);
+  if (!fs.existsSync(profileJson)) {
+    send(event, 'status', 'Installation de Fabric...');
+    fs.mkdirSync(path.dirname(profileJson), { recursive: true });
+    await download(FABRIC_PROFILE_URL, profileJson);
+    const controle = JSON.parse(fs.readFileSync(profileJson, 'utf8'));
+    if (controle.id !== FABRIC_PROFILE) {
+      fs.unlinkSync(profileJson);
+      throw new Error("L'installation de Fabric a échoué (profil inattendu)");
+    }
+  }
+  const profil = JSON.parse(fs.readFileSync(profileJson, 'utf8'));
 
   send(event, 'status', 'Lancement du jeu...');
   send(event, 'progress', 60);
@@ -510,12 +511,15 @@ ipcMain.handle('launch', async (event) => {
     authorization: auth,
     root: GAME_DIR,
     version: {
-      number: '1.20.1',
-      type: 'release'
+      number: MINECRAFT_VERSION,
+      type: 'release',
+      custom: FABRIC_PROFILE
     },
     javaPath,
-    // Toujours fournir l'installateur pour charger Forge, meme si son cache existe.
-    forge: FORGE_JAR,
+    // MCLC applique bien les arguments JEU du JSON custom, mais pas ses
+    // arguments JVM : on ne transmet donc que ces derniers (lecon du profil
+    // NeoForge, valable pour le -DFabricMcEmu du profil Fabric).
+    customArgs: (profil.arguments && profil.arguments.jvm || []).filter((a) => typeof a === 'string'),
     memory: { max: `${settings.ramGB}G`, min: '1G' }
   });
 
@@ -530,15 +534,9 @@ function findJavaw(gameDir) {
   const isMac = process.platform === 'darwin';
   const exe = isWin ? 'javaw.exe' : 'java';
 
-  // 1. JRE bundlé par Minecraft
-  const runtimeDir = path.join(gameDir, 'runtime');
-  if (fs.existsSync(runtimeDir)) {
-    const osDir = isWin ? 'windows-x64' : (process.arch === 'arm64' ? 'mac-os-arm64' : 'mac-os');
-    for (const name of fs.readdirSync(runtimeDir)) {
-      const p = path.join(runtimeDir, name, osDir, name, 'bin', exe);
-      if (fs.existsSync(p)) return p;
-    }
-  }
+  // 1. Java 21 deja installe par ce launcher
+  const bundled = findFileRecursive(path.join(gameDir, 'runtime', 'temurin21'), exe);
+  if (bundled) return bundled;
   // 2. JAVA_HOME
   if (process.env.JAVA_HOME) {
     const p = path.join(process.env.JAVA_HOME, 'bin', exe);
@@ -546,21 +544,27 @@ function findJavaw(gameDir) {
   }
   // 3. Emplacements courants
   const candidates = isWin ? [
-    'C:\\Program Files\\Java\\jdk-17\\bin\\javaw.exe',
-    'C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.11.0+9\\bin\\javaw.exe',
-    'C:\\Program Files\\Microsoft\\jdk-17.0.11.9-hotspot\\bin\\javaw.exe',
+    'C:\\Program Files\\Java\\jdk-21\\bin\\javaw.exe',
+    'C:\\Program Files\\Eclipse Adoptium\\jdk-21\\bin\\javaw.exe',
+    'C:\\Program Files\\Microsoft\\jdk-21\\bin\\javaw.exe',
   ] : isMac ? [
-    '/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin/java',
-    '/usr/local/opt/openjdk@17/bin/java',
-    '/opt/homebrew/opt/openjdk@17/bin/java',
+    '/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java',
+    '/usr/local/opt/openjdk@21/bin/java',
+    '/opt/homebrew/opt/openjdk@21/bin/java',
   ] : [];
   const found = candidates.find(p => fs.existsSync(p));
   return found || undefined;
 }
 
+// Minecraft 1.21.4 / NeoForge 21.4 exigent Java 21 : un Java qui tourne mais en 17
+// ne suffit pas, on lit le numero majeur dans la sortie de `-version`.
 function checkJavaWorks(javaPath) {
   return new Promise((resolve) => {
-    execFile(javaPath, ['-version'], (error) => resolve(!error));
+    execFile(javaPath, ['-version'], (error, stdout, stderr) => {
+      if (error) return resolve(false);
+      const match = /version "(\d+)/.exec(`${stdout}${stderr}`);
+      resolve(!!match && parseInt(match[1], 10) >= 21);
+    });
   });
 }
 
@@ -578,31 +582,31 @@ function findFileRecursive(dir, filename) {
   return null;
 }
 
-// Telecharge et installe un Java 17 (Eclipse Temurin) portable si le joueur n'en a pas deja un qui fonctionne.
-async function ensureJava17(gameDir, event) {
+// Telecharge et installe un Java 21 (Eclipse Temurin) portable si le joueur n'en a pas deja un qui convient.
+async function ensureJava21(gameDir, event) {
   const isWin = process.platform === 'win32';
   const exeName = isWin ? 'javaw.exe' : 'java';
 
   const existing = findJavaw(gameDir);
   if (existing && await checkJavaWorks(existing)) return existing;
 
-  const runtimeDir = path.join(gameDir, 'runtime', 'temurin17');
+  const runtimeDir = path.join(gameDir, 'runtime', 'temurin21');
   let found = findFileRecursive(runtimeDir, exeName);
   if (found && await checkJavaWorks(found)) return found;
 
-  send(event, 'status', 'Téléchargement de Java 17...');
+  send(event, 'status', 'Téléchargement de Java 21...');
   fs.mkdirSync(runtimeDir, { recursive: true });
 
   const arch = process.arch === 'arm64' ? 'aarch64' : 'x64';
   const osName = isWin ? 'windows' : 'mac';
-  const archiveUrl = `https://api.adoptium.net/v3/binary/latest/17/ga/${osName}/${arch}/jre/hotspot/normal/eclipse`;
-  const archivePath = path.join(app.getPath('temp'), isWin ? 'odal-temurin17.zip' : 'odal-temurin17.tar.gz');
+  const archiveUrl = `https://api.adoptium.net/v3/binary/latest/21/ga/${osName}/${arch}/jre/hotspot/normal/eclipse`;
+  const archivePath = path.join(app.getPath('temp'), isWin ? 'odalpaper-temurin21.zip' : 'odalpaper-temurin21.tar.gz');
 
   await download(archiveUrl, archivePath, (p) => {
     send(event, 'progress', 40 + Math.round(p * 5));
   });
 
-  send(event, 'status', 'Installation de Java 17...');
+  send(event, 'status', 'Installation de Java 21...');
   if (isWin) {
     const extractZip = require('extract-zip');
     await extractZip(archivePath, { dir: runtimeDir });
@@ -614,15 +618,13 @@ async function ensureJava17(gameDir, event) {
 
   found = findFileRecursive(runtimeDir, exeName);
   if (!found || !(await checkJavaWorks(found))) {
-    throw new Error("Impossible d'installer Java 17 automatiquement");
+    throw new Error("Impossible d'installer Java 21 automatiquement");
   }
   return found;
 }
 
 function writeServersDat(gameDir) {
   const dest = path.join(gameDir, 'servers.dat');
-  const host = Buffer.from(SERVER_IP, 'utf8');
-  const sname = Buffer.from('Odal', 'utf8');
   const buf = Buffer.alloc(512);
   let o = 0;
   const str = (name, val) => {
@@ -648,8 +650,8 @@ function writeServersDat(gameDir) {
   listName.copy(buf, o); o += listName.length;
   buf[o++] = 10;
   buf.writeInt32BE(1, o); o += 4;
-  str('ip', SERVER_IP);
-  str('name', 'Odal');
+  str('ip', `${SERVER_IP}:${SERVER_PORT}`);
+  str('name', SERVER_LABEL);
   // Le pack Odal est obligatoire et provient de notre propre serveur. En
   // enregistrant ce choix dans servers.dat, Minecraft le telecharge sans
   // afficher l'ecran de confirmation a chaque installation du launcher.
@@ -665,63 +667,22 @@ async function syncMods(modsDir, event) {
   if (!fs.existsSync(manifest)) return;
 
   const mods = JSON.parse(fs.readFileSync(manifest, 'utf8'));
-  // Development-only override: test a local unpublished companion JAR without
-  // adding licensed model assets to the launcher's distributable mods-pack.
-  const developmentCompanionPath = !app.isPackaged
-    ? (process.env.ODAL_COMPANION_DEV_JAR || '')
-    : '';
-  const useDevelopmentCompanion = developmentCompanionPath
-    && fs.existsSync(developmentCompanionPath);
-  const requiredCompanionMod = useDevelopmentCompanion
-    ? path.basename(developmentCompanionPath)
-    : REQUIRED_COMPANION_MOD;
-  const requiredCompanionHash = useDevelopmentCompanion
-    ? crypto.createHash('sha256').update(fs.readFileSync(developmentCompanionPath)).digest('hex')
-    : REQUIRED_COMPANION_MOD_SHA256;
-  const platformMods = getPlatformMods(mods).map((mod) =>
-    mod.name === REQUIRED_COMPANION_MOD
-      ? { ...mod, name: requiredCompanionMod }
-      : mod
-  );
+  const platformMods = getPlatformMods(mods);
   const expectedJars = new Set(platformMods.map((mod) => mod.name.toLowerCase()));
-  // Le mod GUI est aussi livré comme ressource externe à app.asar afin que sa
-  // copie soit fiable sur macOS. Les autres mods restent disponibles dans
-  // app.asar, ce qui évite qu'Apple inspecte les binaires natifs de leurs jars.
   const packagedPackDir = path.join(process.resourcesPath, 'mods-pack');
   const archivedPackDir = path.join(__dirname, 'mods-pack');
-  const macPackDir = path.join(process.resourcesPath, 'mods-pack-mac');
-  const packagedGuiModSource = path.join(
-    process.platform === 'darwin' ? macPackDir : packagedPackDir,
-    REQUIRED_GUI_MOD
-  );
-  // In development Electron has no packaged resources directory. Fall back to
-  // the project mod pack so the same integrity check remains active locally.
-  const guiModSource = fs.existsSync(packagedGuiModSource)
-    ? packagedGuiModSource
-    : path.join(archivedPackDir, REQUIRED_GUI_MOD);
-  const requiredGuiModHash = process.platform === 'darwin' ? REQUIRED_GUI_MOD_SHA256_MAC : REQUIRED_GUI_MOD_SHA256_WINDOWS;
-  const companionModSource = useDevelopmentCompanion
-    ? developmentCompanionPath
-    : path.join(archivedPackDir, REQUIRED_COMPANION_MOD);
-  logToFile('COMPANION_SOURCE', companionModSource);
+  const sha256Of = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
-  if (!expectedJars.has(REQUIRED_GUI_MOD.toLowerCase()) || !fs.existsSync(guiModSource)) {
-    throw new Error(`Le mod obligatoire ${REQUIRED_GUI_MOD} manque dans le launcher`);
-  }
-  const guiModHash = crypto.createHash('sha256')
-    .update(fs.readFileSync(guiModSource))
-    .digest('hex');
-  if (guiModHash !== requiredGuiModHash) {
-    throw new Error(`La version embarquée de ${REQUIRED_GUI_MOD} est incorrecte`);
-  }
-  if (!expectedJars.has(requiredCompanionMod.toLowerCase()) || !fs.existsSync(companionModSource)) {
-    throw new Error(`Le mod obligatoire ${requiredCompanionMod} manque dans le launcher`);
-  }
-  const companionModHash = crypto.createHash('sha256')
-    .update(fs.readFileSync(companionModSource))
-    .digest('hex');
-  if (companionModHash !== requiredCompanionHash) {
-    throw new Error(`La version embarquée de ${requiredCompanionMod} est incorrecte`);
+  // Porte d'integrite : chaque mod maison epingle doit etre dans le manifeste, present
+  // dans le pack embarque, et correspondre a l'empreinte attendue.
+  for (const required of REQUIRED_MODS) {
+    const source = path.join(archivedPackDir, required.name);
+    if (!expectedJars.has(required.name.toLowerCase()) || !fs.existsSync(source)) {
+      throw new Error(`Le mod obligatoire ${required.name} manque dans le launcher`);
+    }
+    if (sha256Of(source) !== required.sha256) {
+      throw new Error(`La version embarquée de ${required.name} est incorrecte`);
+    }
   }
 
   // Le dossier du launcher est la source de verite : supprimer tout ancien
@@ -738,18 +699,14 @@ async function syncMods(modsDir, event) {
   for (let i = 0; i < platformMods.length; i++) {
     const mod = platformMods[i];
     const dest = path.join(modsDir, mod.name);
-    const externalSrc = mod.name === REQUIRED_GUI_MOD ? guiModSource : path.join(packagedPackDir, mod.name);
+    const externalSrc = path.join(packagedPackDir, mod.name);
     const archivedSrc = path.join(archivedPackDir, mod.name);
     const localSrc = fs.existsSync(externalSrc) ? externalSrc : archivedSrc;
 
     if (fs.existsSync(dest)) {
       if (fs.existsSync(localSrc)) {
-        const sourceStat = fs.statSync(localSrc);
-        const destStat = fs.statSync(dest);
-        const filesDiffer = sourceStat.size !== destStat.size
-          || crypto.createHash('sha256').update(fs.readFileSync(localSrc)).digest('hex')
-            !== crypto.createHash('sha256').update(fs.readFileSync(dest)).digest('hex');
-
+        const filesDiffer = fs.statSync(localSrc).size !== fs.statSync(dest).size
+          || sha256Of(localSrc) !== sha256Of(dest);
         if (filesDiffer) {
           send(event, 'status', `Mise à jour : ${mod.name}`);
           fs.copyFileSync(localSrc, dest);
@@ -772,22 +729,13 @@ async function syncMods(modsDir, event) {
     send(event, 'progress', 45 + Math.round(((i + 1) / platformMods.length) * 15));
   }
 
-  // Dernier contrôle juste avant le lancement du jeu : aucune ancienne
-  // version du compagnon ne doit pouvoir survivre à la synchronisation.
-  for (const file of fs.readdirSync(modsDir)) {
-    const lower = file.toLowerCase();
-    if (lower.startsWith('odalcompanion-') && lower.endsWith('.jar')
-        && lower !== requiredCompanionMod.toLowerCase()) {
-      fs.unlinkSync(path.join(modsDir, file));
+  // Dernier controle avant le lancement : le jar en place doit etre celui epingle.
+  for (const required of REQUIRED_MODS) {
+    const dest = path.join(modsDir, required.name);
+    if (!fs.existsSync(dest) || sha256Of(dest) !== required.sha256) {
+      send(event, 'status', `Mise à jour obligatoire : ${required.name}`);
+      fs.copyFileSync(path.join(archivedPackDir, required.name), dest);
     }
-  }
-  const companionDest = path.join(modsDir, requiredCompanionMod);
-  const installedCompanionHash = fs.existsSync(companionDest)
-    ? crypto.createHash('sha256').update(fs.readFileSync(companionDest)).digest('hex')
-    : '';
-  if (installedCompanionHash !== requiredCompanionHash) {
-    send(event, 'status', `Mise à jour obligatoire : ${requiredCompanionMod}`);
-    fs.copyFileSync(companionModSource, companionDest);
   }
 }
 

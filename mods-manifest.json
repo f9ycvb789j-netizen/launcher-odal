@@ -1,39 +1,110 @@
 [
-  { "name": "alexsmobs-1.22.9.jar",                              "url": "URL_A_REMPLIR" },
-  { "name": "architectury-9.2.14-forge.jar",                     "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1MKTLiiG/architectury-9.2.14-forge.jar" },
-  { "name": "bettercombat-forge-1.9.0+1.20.1.jar",               "url": "https://modrinth.com/mod/better-combat" },
-  { "name": "bucketlib-1.20.1-2.3.8.0.jar",                      "url": "URL_A_REMPLIR" },
-  { "name": "citadel-2.6.3-1.20.1.jar",                          "url": "URL_A_REMPLIR" },
-  { "name": "cloth-config-11.1.136-forge.jar",                   "url": "https://modrinth.com/mod/cloth-config" },
-  { "name": "CustomSkinLoader_ForgeV2-14.28.jar",                "url": "https://cdn.modrinth.com/data/idMHQ4n2/versions/Rcbx2QhV/CustomSkinLoader_ForgeV2-14.28.jar" },
-  { "name": "dawnoftimebuilder-forge-1.20.1-1.5.52.jar",         "url": "https://cdn.modrinth.com/data/RgWXq0La/versions/zHqYLK1A/dawnoftimebuilder-forge-1.20.1-1.5.52.jar" },
-  { "name": "DistantHorizons-2.3.6-b-1.20.1-fabric-forge.jar",   "url": "URL_A_REMPLIR" },
-  { "name": "easy_npc-forge-1.20.1-5.9.2.jar",                   "url": "URL_A_REMPLIR" },
-  { "name": "embeddium-0.3.31+mc1.20.1.jar",                     "url": "URL_A_REMPLIR" },
-  { "name": "Forgematica-0.1.13-mc1.20.1.jar",                   "url": "URL_A_REMPLIR" },
-  { "name": "geckolib-forge-1.20.1-4.8.4.jar",                   "url": "URL_A_REMPLIR" },
-  { "name": "immersive_aircraft-1.4.1+1.20.1-forge.jar",         "url": "URL_A_REMPLIR" },
-  { "name": "islandfactionsgui-1.0.0.jar",                       "url": "URL_A_REMPLIR" },
-  { "name": "jagtaczarmor-1.0.7.jar",                            "url": "URL_A_REMPLIR" },
-  { "name": "jei-1.20.1-forge-15.20.0.133.jar",                  "url": "URL_A_REMPLIR" },
-  { "name": "MaFgLib-0.1.14-mc1.20.1.jar",                       "url": "URL_A_REMPLIR" },
-  { "name": "Netherrocks-1.20.1-6.0.0.1.jar",                    "url": "URL_A_REMPLIR" },
-  { "name": "oculus-mc1.20.1-1.8.0 .jar",                        "url": "URL_A_REMPLIR" },
-  { "name": "odalairways-0.5.1.jar",                             "url": "URL_A_REMPLIR" },
-  { "name": "odalbosses-1.0.0.jar",                              "url": "URL_A_REMPLIR" },
-  { "name": "odalcompanion-0.19.10.jar",                          "url": "URL_A_REMPLIR" },
-  { "name": "odaldrapeau-1.0.0.jar",                             "url": "URL_A_REMPLIR" },
-  { "name": "odalmaquette-1.0.0.jar",                            "url": "URL_A_REMPLIR" },
-  { "name": "odalnavires-1.0.0.jar",                            "url": "URL_A_REMPLIR" },
-  { "name": "odaltaczschematics-1.0.0.jar",                      "url": "URL_A_REMPLIR" },
-  { "name": "player-animation-lib-forge-1.0.2-rc1+1.20 (1).jar", "url": "URL_A_REMPLIR" },
-  { "name": "punchy-2.7c-forge-1.20.1.jar",                      "url": "https://cdn.modrinth.com/data/8aoMKplv/versions/XqtbjmO7/punchy-2.7c-forge-1.20.1.jar" },
-  { "name": "SimpleCoreLib-1.20.1-6.0.1.2.jar",                  "url": "URL_A_REMPLIR" },
-  { "name": "SimpleOres2-1.20.1-6.0.0.3.jar",                    "url": "URL_A_REMPLIR" },
-  { "name": "smallships-forge-1.20.1-2.0.0-b1.4.jar",            "url": "URL_A_REMPLIR" },
-  { "name": "tacz-1.20.1-1.1.8-hotfix.jar",                      "url": "URL_A_REMPLIR" },
-  { "name": "voicechat-forge-1.20.1-2.6.21.jar",                 "url": "URL_A_REMPLIR" },
-  { "name": "xaerominimap-forge-1.20.1-26.1.0.jar",              "url": "URL_A_REMPLIR" },
-  { "name": "xaeroworldmap-forge-1.20.1-1.41.2.jar",             "url": "URL_A_REMPLIR" },
-  { "name": "yet_another_config_lib_v3-3.6.6+1.20.1-forge.jar",  "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/sCWgXDYQ/yet_another_config_lib_v3-3.6.6%2B1.20.1-forge.jar" }
+  {
+    "name": "AmbientSounds_FABRIC_v6.3.5_mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/fM515JnW/versions/JZUqW70J/AmbientSounds_FABRIC_v6.3.5_mc1.21.11.jar"
+  },
+  {
+    "name": "bobby-5.2.11.1+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/M08ruV16/versions/ZwOXWoVI/bobby-5.2.11.1%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "chat_heads-1.2.8-fabric-1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/Wb5oqrBJ/versions/uQ4oSnyu/chat_heads-1.2.8-fabric-1.21.11.jar"
+  },
+  {
+    "name": "CreativeCore_FABRIC_v2.14.11_mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/OsZiaDHq/versions/jyLHWJlj/CreativeCore_FABRIC_v2.14.11_mc1.21.11.jar"
+  },
+  {
+    "name": "CustomSkinLoader_Universal-15.0.1.jar",
+    "url": "https://cdn.modrinth.com/data/idMHQ4n2/versions/OLaesh5y/CustomSkinLoader_Universal-15.0.1.jar"
+  },
+  {
+    "name": "DistantHorizons-3.2.0-b-1.21.11-fabric-neoforge.jar",
+    "url": "https://cdn.modrinth.com/data/uCdwusMi/versions/bCTilxSz/DistantHorizons-3.2.0-b-1.21.11-fabric-neoforge.jar"
+  },
+  {
+    "name": "entity_model_features-3.3.5-1.21.11-fabric.jar",
+    "url": "https://cdn.modrinth.com/data/4I1XuqiY/versions/Ym9Qq1ZU/entity_model_features-3.3.5-1.21.11-fabric.jar"
+  },
+  {
+    "name": "entity_texture_features-7.2.1-1.21.11-fabric.jar",
+    "url": "https://cdn.modrinth.com/data/BVzZfTc1/versions/9uQFLvtW/entity_texture_features-7.2.1-1.21.11-fabric.jar"
+  },
+  {
+    "name": "fabric-api-0.141.6+1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/6qAuTtLR/fabric-api-0.141.6%2B1.21.11.jar"
+  },
+  {
+    "name": "firstperson-fabric-2.7.2-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/H5XMjpHi/versions/EqDE0uC5/firstperson-fabric-2.7.2-mc1.21.11.jar"
+  },
+  {
+    "name": "ForgeConfigAPIPort-v21.11.1-mc1.21.11-Fabric.jar",
+    "url": "https://cdn.modrinth.com/data/ohNO6lps/versions/uXrWPsCu/ForgeConfigAPIPort-v21.11.1-mc1.21.11-Fabric.jar"
+  },
+  {
+    "name": "iris-fabric-1.10.7+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/fDpuVzVr/iris-fabric-1.10.7%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "litematica-fabric-1.21.11-0.26.15.jar",
+    "url": "https://cdn.modrinth.com/data/bEpr0Arc/versions/SLidwkWA/litematica-fabric-1.21.11-0.26.15.jar"
+  },
+  {
+    "name": "malilib-fabric-1.21.11-0.27.20.jar",
+    "url": "https://cdn.modrinth.com/data/GcWjdA9I/versions/loabWpyU/malilib-fabric-1.21.11-0.27.20.jar"
+  },
+  {
+    "name": "notenoughanimations-fabric-1.12.4-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/MPCX6s5C/versions/LU326iui/notenoughanimations-fabric-1.12.4-mc1.21.11.jar"
+  },
+  {
+    "name": "particlerain-4.0.0-beta.11+1.21.11-fabric.jar",
+    "url": "https://cdn.modrinth.com/data/nrikgvxm/versions/7LBHIjGq/particlerain-4.0.0-beta.11%2B1.21.11-fabric.jar"
+  },
+  {
+    "name": "punchy-2.7e-fabric-1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/8aoMKplv/versions/evVXtKxh/punchy-2.7e-fabric-1.21.11.jar"
+  },
+  {
+    "name": "ShoulderSurfing-Fabric-1.21.11-5.0.10.jar",
+    "url": "https://cdn.modrinth.com/data/kepjj2sy/versions/9T2YSavE/ShoulderSurfing-Fabric-1.21.11-5.0.10.jar"
+  },
+  {
+    "name": "voicechat-fabric-1.21.11-2.6.23.jar",
+    "url": "https://cdn.modrinth.com/data/9eGKb6K1/versions/wxtfwA33/voicechat-fabric-1.21.11-2.6.23.jar"
+  },
+  {
+    "name": "skinlayers3d-fabric-1.11.2-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/zV5r3pPn/versions/3kCdl1bI/skinlayers3d-fabric-1.11.2-mc1.21.11.jar"
+  },
+  {
+    "name": "smoothswapping-0.9.8-1.21.11-fabric.jar",
+    "url": "https://cdn.modrinth.com/data/ydZic5r4/versions/Udmk6JVV/smoothswapping-0.9.8-1.21.11-fabric.jar"
+  },
+  {
+    "name": "sodium-fabric-0.8.7+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/AANobbMI/versions/UddlN6L4/sodium-fabric-0.8.7%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "waveycapes-fabric-1.11.0-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/kYuIpRLv/versions/8988sloO/waveycapes-fabric-1.11.0-mc1.21.11.jar"
+  },
+  {
+    "name": "xaerominimap-fabric-1.21.11-26.4.2.jar",
+    "url": "https://cdn.modrinth.com/data/1bokaNcj/versions/8MdqDp18/xaerominimap-fabric-1.21.11-26.4.2.jar"
+  },
+  {
+    "name": "xaeroworldmap-fabric-1.21.11-1.45.0.jar",
+    "url": "https://cdn.modrinth.com/data/NcUtCpym/versions/4PX8T9We/xaeroworldmap-fabric-1.21.11-1.45.0.jar"
+  },
+  {
+    "name": "yet_another_config_lib_v3-3.8.2+1.21.11-fabric.jar",
+    "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/pHWDw3Vc/yet_another_config_lib_v3-3.8.2%2B1.21.11-fabric.jar"
+  },
+  {
+    "name": "islandfactionsgui-2.2.0.jar",
+    "url": "URL_A_REMPLIR"
+  }
 ]
