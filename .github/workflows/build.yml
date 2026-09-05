@@ -56,7 +56,9 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:mac 2>&1 | tee build-mac.log
+        run: |
+          set -o pipefail
+          npm run build:mac 2>&1 | tee build-mac.log
       # Le build Mac echoue par intermittence et les logs Actions ne sont pas
       # lisibles sans compte : on publie la fin du log en issue pour diagnostic.
       - name: Publier l'erreur en issue si echec
