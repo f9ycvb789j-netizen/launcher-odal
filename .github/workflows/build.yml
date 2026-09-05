@@ -28,7 +28,9 @@ jobs:
           path: dist/*.exe
 
   build-mac:
-    runs-on: macos-latest
+    # macos-latest est passe sous macOS 26 le 05/09/2026 et la signature y echoue
+    # systematiquement (SecKeychainUnlock au set-key-partition-list) : image epinglee.
+    runs-on: macos-15
     permissions:
       contents: read
       issues: write
