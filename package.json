@@ -1,6 +1,6 @@
 {
   "name": "launcher-odal",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Launcher Odal (serveur Paper 1.21.11, client Fabric)",
   "main": "main.js",
   "scripts": {
