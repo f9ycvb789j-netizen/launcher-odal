@@ -57,7 +57,7 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 // pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
 const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-2.3.0.jar', sha256: 'ece50189ab1d928ac980f5b13d0d6e980b8f07419dc542d446a503745ab05bce' },
+  { name: 'islandfactionsgui-2.3.1.jar', sha256: '38106dd26672b6ce95ef4b9fe20fd3a20a3688f612af402a80ca35fced59300c' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
   { name: 'odalcompanion-2.0.6.jar', sha256: '041a4721a2180a37ce18b08aa9eea94c91e3876da3e665eddf8bb39f9e9e97d5' },
 ];
@@ -688,11 +688,21 @@ async function syncMods(modsDir, event) {
 
   // Le dossier du launcher est la source de verite : supprimer tout ancien
   // mod retire du pack pour que les joueurs aient exactement la meme liste.
+  // Sous Windows, un jar charge par un Minecraft encore ouvert ne peut pas etre
+  // supprime : on le dit clairement au lieu de rester fige sur la verification.
   if (fs.existsSync(modsDir)) {
     for (const file of fs.readdirSync(modsDir)) {
       if (file.toLowerCase().endsWith('.jar') &&
           !expectedJars.has(file.toLowerCase())) {
-        fs.unlinkSync(path.join(modsDir, file));
+        try {
+          fs.unlinkSync(path.join(modsDir, file));
+        } catch (err) {
+          if (err && (err.code === 'EBUSY' || err.code === 'EPERM')) {
+            throw new Error('Ferme le Minecraft déjà ouvert puis relance : ' +
+                'le mod ' + file + ' est utilisé par le jeu en cours.');
+          }
+          throw err;
+        }
       }
     }
   }
@@ -710,7 +720,15 @@ async function syncMods(modsDir, event) {
           || sha256Of(localSrc) !== sha256Of(dest);
         if (filesDiffer) {
           send(event, 'status', `Mise à jour : ${mod.name}`);
-          fs.copyFileSync(localSrc, dest);
+          try {
+            fs.copyFileSync(localSrc, dest);
+          } catch (err) {
+            if (err && (err.code === 'EBUSY' || err.code === 'EPERM')) {
+              throw new Error('Ferme le Minecraft déjà ouvert puis relance : ' +
+                  'le mod ' + mod.name + ' est utilisé par le jeu en cours.');
+            }
+            throw err;
+          }
         }
       }
       send(event, 'progress', 45 + Math.round(((i + 1) / platformMods.length) * 15));
@@ -735,7 +753,15 @@ async function syncMods(modsDir, event) {
     const dest = path.join(modsDir, required.name);
     if (!fs.existsSync(dest) || sha256Of(dest) !== required.sha256) {
       send(event, 'status', `Mise à jour obligatoire : ${required.name}`);
-      fs.copyFileSync(path.join(archivedPackDir, required.name), dest);
+      try {
+        fs.copyFileSync(path.join(archivedPackDir, required.name), dest);
+      } catch (err) {
+        if (err && (err.code === 'EBUSY' || err.code === 'EPERM')) {
+          throw new Error('Ferme le Minecraft déjà ouvert puis relance : ' +
+              'le mod ' + required.name + ' est utilisé par le jeu en cours.');
+        }
+        throw err;
+      }
     }
   }
 }

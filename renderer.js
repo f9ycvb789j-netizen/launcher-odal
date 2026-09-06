@@ -335,11 +335,27 @@ btnSocialX.addEventListener('click', () => window.launcher.openUrl('https://x.co
 btnSocialInstagram.addEventListener('click', () => window.launcher.openUrl('https://www.instagram.com'));
 btnSocialDiscord.addEventListener('click', () => window.launcher.openUrl('https://discord.com'));
 
+// Le lancement peut échouer (jar verrouillé par un jeu déjà ouvert, réseau...) :
+// sans ce garde-fou, la promesse rejetée laissait l'écran figé sur le dernier statut.
+async function lancerJeu() {
+  try {
+    const result = await window.launcher.launch();
+    if (result && result.success === false) {
+      setStatus(result.error || 'Le lancement a échoué');
+      btnJoin.disabled = false;
+    }
+  } catch (err) {
+    const message = String(err && err.message ? err.message : err);
+    setStatus(message.replace(/^Error invoking remote method 'launch': Error: /, ''));
+    btnJoin.disabled = false;
+  }
+}
+
 btnJoin.addEventListener('click', async () => {
   if (isLoggedIn && !showAddAccountForm) {
     btnJoin.disabled = true;
     setStatus('Démarrage...');
-    await window.launcher.launch();
+    await lancerJeu();
     return;
   }
 
@@ -393,7 +409,7 @@ btnJoin.addEventListener('click', async () => {
 
   btnJoin.disabled = true;
   setStatus('Démarrage...');
-  await window.launcher.launch();
+  await lancerJeu();
 });
 
 // Entrée clavier
