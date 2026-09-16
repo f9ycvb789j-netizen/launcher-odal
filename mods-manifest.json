@@ -24,6 +24,10 @@
     "url": "https://cdn.modrinth.com/data/uCdwusMi/versions/bCTilxSz/DistantHorizons-3.2.0-b-1.21.11-fabric-neoforge.jar"
   },
   {
+    "name": "emotecraft-fabric-for-MC1.21.11-3.2.0-b.build.163.jar",
+    "url": "https://cdn.modrinth.com/data/pZ2wrerK/versions/Hwqp4xhc/emotecraft-fabric-for-MC1.21.11-3.2.0-b.build.163.jar"
+  },
+  {
     "name": "entity_model_features-3.3.5-1.21.11-fabric.jar",
     "url": "https://cdn.modrinth.com/data/4I1XuqiY/versions/Ym9Qq1ZU/entity_model_features-3.3.5-1.21.11-fabric.jar"
   },
@@ -48,6 +52,10 @@
     "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/fDpuVzVr/iris-fabric-1.10.7%2Bmc1.21.11.jar"
   },
   {
+    "name": "islandfactionsgui-2.6.2.jar",
+    "url": "URL_A_REMPLIR"
+  },
+  {
     "name": "litematica-fabric-1.21.11-0.26.15.jar",
     "url": "https://cdn.modrinth.com/data/bEpr0Arc/versions/SLidwkWA/litematica-fabric-1.21.11-0.26.15.jar"
   },
@@ -56,16 +64,28 @@
     "url": "https://cdn.modrinth.com/data/GcWjdA9I/versions/loabWpyU/malilib-fabric-1.21.11-0.27.20.jar"
   },
   {
+    "name": "modmenu-17.0.0.jar",
+    "url": "https://cdn.modrinth.com/data/mOgUt4GM/versions/Tyk71iSw/modmenu-17.0.0.jar"
+  },
+  {
     "name": "notenoughanimations-fabric-1.12.4-mc1.21.11.jar",
     "url": "https://cdn.modrinth.com/data/MPCX6s5C/versions/LU326iui/notenoughanimations-fabric-1.12.4-mc1.21.11.jar"
   },
   {
-    "name": "odalcompanion-2.8.6.jar",
+    "name": "odalcompanion-2.9.0.jar",
     "url": "URL_A_REMPLIR"
   },
   {
     "name": "particlerain-4.0.0-beta.11+1.21.11-fabric.jar",
     "url": "https://cdn.modrinth.com/data/nrikgvxm/versions/7LBHIjGq/particlerain-4.0.0-beta.11%2B1.21.11-fabric.jar"
+  },
+  {
+    "name": "placeholder-api-2.8.2+1.21.10.jar",
+    "url": "https://cdn.modrinth.com/data/eXts2L7r/versions/qxjzQ9xY/placeholder-api-2.8.2%2B1.21.10.jar"
+  },
+  {
+    "name": "PlayerAnimationLibFabric-1.1.10+mc.1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/ha1mEyJS/versions/wJLdv4ZQ/PlayerAnimationLibFabric-1.1.10%2Bmc.1.21.11.jar"
   },
   {
     "name": "punchy-2.7e-fabric-1.21.11.jar",
@@ -74,10 +94,6 @@
   {
     "name": "ShoulderSurfing-Fabric-1.21.11-5.0.10.jar",
     "url": "https://cdn.modrinth.com/data/kepjj2sy/versions/9T2YSavE/ShoulderSurfing-Fabric-1.21.11-5.0.10.jar"
-  },
-  {
-    "name": "voicechat-fabric-1.21.11-2.6.23.jar",
-    "url": "https://cdn.modrinth.com/data/9eGKb6K1/versions/wxtfwA33/voicechat-fabric-1.21.11-2.6.23.jar"
   },
   {
     "name": "skinlayers3d-fabric-1.11.2-mc1.21.11.jar",
@@ -90,6 +106,10 @@
   {
     "name": "sodium-fabric-0.8.7+mc1.21.11.jar",
     "url": "https://cdn.modrinth.com/data/AANobbMI/versions/UddlN6L4/sodium-fabric-0.8.7%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "voicechat-fabric-1.21.11-2.6.23.jar",
+    "url": "https://cdn.modrinth.com/data/9eGKb6K1/versions/wxtfwA33/voicechat-fabric-1.21.11-2.6.23.jar"
   },
   {
     "name": "waveycapes-fabric-1.11.0-mc1.21.11.jar",
@@ -106,9 +126,5 @@
   {
     "name": "yet_another_config_lib_v3-3.8.2+1.21.11-fabric.jar",
     "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/pHWDw3Vc/yet_another_config_lib_v3-3.8.2%2B1.21.11-fabric.jar"
-  },
-  {
-    "name": "islandfactionsgui-2.6.1.jar",
-    "url": "URL_A_REMPLIR"
   }
 ]

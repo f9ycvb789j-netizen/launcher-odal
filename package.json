@@ -1,6 +1,6 @@
 {
   "name": "launcher-odal",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "description": "Launcher Odal (serveur Paper 1.21.11, client Fabric)",
   "main": "main.js",
   "scripts": {
@@ -31,7 +31,8 @@
       "mods-pack-mac/**",
       "node_modules/**",
       "resource-packs.js",
-      "resourcepacks-pack/**"
+      "resourcepacks-pack/**",
+      "emotes-pack/**"
     ],
     "win": {
       "target": [

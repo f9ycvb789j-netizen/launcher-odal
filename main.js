@@ -8,7 +8,7 @@ const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
 const { ensureShoulderSurfingDefault } = require('./shoulder-surfing-config');
 const { ensureCustomSkinLoaderConfig } = require('./custom-skin-loader-config');
-const { ensureBundledResourcePacks } = require('./resource-packs');
+const { ensureBundledResourcePacks, ensureBundledEmotes, ensureEmoteKeyFree } = require('./resource-packs');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -57,9 +57,9 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 // pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
 const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-2.6.1.jar', sha256: '6ee11f9ed0f0fffbb5645a4f6588a8c5914a4b67588e96f5f4e4bc03781a8745' },
+  { name: 'islandfactionsgui-2.6.2.jar', sha256: '9ac8c2f418098a73de7fed05f9598ff89d250f2cfeb60fe161c21133f984bcfc' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
-  { name: 'odalcompanion-2.8.6.jar', sha256: '64eddf70a613978d8e65dd0652637e2278caf9e9e0f6700778b76f39abbbf90e' },
+  { name: 'odalcompanion-2.9.0.jar', sha256: '06288443af9581ab4d9259f2db24488fb05f21096bf8099333f78dda03740eb3' },
 ];
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
@@ -465,6 +465,9 @@ ipcMain.handle('launch', async (event) => {
   ensureShoulderSurfingDefault(GAME_DIR);
   ensureCustomSkinLoaderConfig(GAME_DIR);
   ensureBundledResourcePacks(GAME_DIR, path.join(__dirname, 'resourcepacks-pack'));
+  // Emotes Emotecraft (pack Izzy converti) : plugin Emotecraft cote serveur, mod cote client.
+  ensureBundledEmotes(GAME_DIR, path.join(__dirname, 'emotes-pack'));
+  ensureEmoteKeyFree(GAME_DIR);
 
   writeServersDat(GAME_DIR);
 

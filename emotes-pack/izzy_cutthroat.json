@@ -1,0 +1,1275 @@
+{
+ "format_version": "1.8.0",
+ "parents": {
+  "hip": "body",
+  "waist": "hip",
+  "torso": "waist",
+  "head": "torso",
+  "right_arm": "torso",
+  "left_arm": "torso",
+  "right_leg": "body",
+  "left_leg": "body"
+ },
+ "model": {
+  "body": {
+   "pivot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "hip": {
+   "pivot": [
+    -0.0,
+    12.0,
+    -0.0
+   ]
+  },
+  "waist": {
+   "pivot": [
+    -0.0,
+    16.0,
+    -0.0
+   ]
+  },
+  "torso": {
+   "pivot": [
+    -0.0,
+    20.0,
+    -0.0
+   ]
+  },
+  "head": {
+   "pivot": [
+    -0.0,
+    24.0,
+    -0.0
+   ]
+  },
+  "right_arm": {
+   "pivot": [
+    5.3333,
+    22.4,
+    -0.0
+   ]
+  },
+  "left_arm": {
+   "pivot": [
+    -5.3333,
+    22.4,
+    -0.0
+   ]
+  },
+  "right_leg": {
+   "pivot": [
+    2.0,
+    12.0,
+    -0.0
+   ]
+  },
+  "left_leg": {
+   "pivot": [
+    -2.0,
+    12.0,
+    -0.0
+   ]
+  }
+ },
+ "animations": {
+  "izzy_cutthroat": {
+   "loop": false,
+   "animation_length": 2.15,
+   "parents": {
+    "hip": "body",
+    "waist": "hip",
+    "torso": "waist",
+    "head": "torso",
+    "right_arm": "torso",
+    "left_arm": "torso",
+    "right_leg": "body",
+    "left_leg": "body"
+   },
+   "model": {
+    "body": {
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "hip": {
+     "pivot": [
+      -0.0,
+      12.0,
+      -0.0
+     ]
+    },
+    "waist": {
+     "pivot": [
+      -0.0,
+      16.0,
+      -0.0
+     ]
+    },
+    "torso": {
+     "pivot": [
+      -0.0,
+      20.0,
+      -0.0
+     ]
+    },
+    "head": {
+     "pivot": [
+      -0.0,
+      24.0,
+      -0.0
+     ]
+    },
+    "right_arm": {
+     "pivot": [
+      5.3333,
+      22.4,
+      -0.0
+     ]
+    },
+    "left_arm": {
+     "pivot": [
+      -5.3333,
+      22.4,
+      -0.0
+     ]
+    },
+    "right_leg": {
+     "pivot": [
+      2.0,
+      12.0,
+      -0.0
+     ]
+    },
+    "left_leg": {
+     "pivot": [
+      -2.0,
+      12.0,
+      -0.0
+     ]
+    }
+   },
+   "player_animation_library": {
+    "name": "Egorgement",
+    "uuid": "acae9517-3013-5ce2-8ecf-74b59a9bd66b"
+   },
+   "bones": {
+    "body": {
+     "position": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.0500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.0213
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.1000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.0853
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.1500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.192
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.3413
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.5333
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.7253
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.8747
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.9813
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4500": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0453
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0231
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.8925
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.6748
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.3918
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.1741
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.0435
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0500": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    },
+    "hip": {
+     "rotation": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2000": {
+       "vector": [
+        12.5,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2500": {
+       "vector": [
+        11.8056,
+        2.0833,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3000": {
+       "vector": [
+        9.7222,
+        8.3333,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3500": {
+       "vector": [
+        6.25,
+        18.75,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4000": {
+       "vector": [
+        2.7778,
+        29.1667,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4500": {
+       "vector": [
+        0.6944,
+        35.4167,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        0.0,
+        37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.1000": {
+       "vector": [
+        -3.15,
+        37.4582,
+        -1.917
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        0.0,
+        37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        0.0,
+        35.9694,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8000": {
+       "vector": [
+        0.0,
+        31.3776,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        0.0,
+        23.7245,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        0.0,
+        13.7755,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9500": {
+       "vector": [
+        0.0,
+        6.1224,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0000": {
+       "vector": [
+        0.0,
+        1.5306,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0500": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     },
+     "position": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3500": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        0.0,
+        0.0,
+        -1.0231
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.8925
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.6748
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.3918
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9500": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.1741
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        -0.0435
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0500": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    },
+    "head": {
+     "rotation": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2500": {
+       "vector": [
+        0.0,
+        -2.0833,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3000": {
+       "vector": [
+        0.0,
+        -8.3333,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3500": {
+       "vector": [
+        0.0,
+        -18.75,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4000": {
+       "vector": [
+        0.0,
+        -29.1667,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4500": {
+       "vector": [
+        0.0,
+        -35.4167,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        0.0,
+        -37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.6000": {
+       "vector": [
+        0.0,
+        -37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.7000": {
+       "vector": [
+        -22.5,
+        -37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.1000": {
+       "vector": [
+        -22.5,
+        -37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.3000": {
+       "vector": [
+        -10.0,
+        -37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.6500": {
+       "vector": [
+        -10.0,
+        -37.5,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        -9.5918,
+        -35.9694,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        -8.3673,
+        -31.3776,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8000": {
+       "vector": [
+        -6.3265,
+        -23.7245,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        -3.6735,
+        -13.7755,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        -1.6327,
+        -6.1224,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9500": {
+       "vector": [
+        -0.4082,
+        -1.5306,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     },
+     "position": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.7000": {
+       "vector": [
+        0.0,
+        0.4267,
+        -0.8533
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.6500": {
+       "vector": [
+        0.0,
+        0.4267,
+        -0.8533
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        0.0,
+        0.4093,
+        -0.8185
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        0.0,
+        0.357,
+        -0.714
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8000": {
+       "vector": [
+        0.0,
+        0.2699,
+        -0.5399
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        0.0,
+        0.1567,
+        -0.3135
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        0.0,
+        0.0697,
+        -0.1393
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9500": {
+       "vector": [
+        0.0,
+        0.0174,
+        -0.0348
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    },
+    "right_arm": {
+     "rotation": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.4000": {
+       "vector": [
+        -3.6292,
+        0.5248,
+        6.527
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.6000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.6500": {
+       "vector": [
+        1.2386,
+        -1.1516,
+        -7.5687
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.7000": {
+       "vector": [
+        4.9543,
+        -4.6065,
+        -30.2749
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.7500": {
+       "vector": [
+        10.5279,
+        -9.7888,
+        -64.3342
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.8000": {
+       "vector": [
+        14.2436,
+        -13.2437,
+        -87.0404
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.8500": {
+       "vector": [
+        15.4822,
+        -14.3953,
+        -94.6091
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.1000": {
+       "vector": [
+        15.4822,
+        -14.3953,
+        -94.6091
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.5500": {
+       "vector": [
+        15.48,
+        -14.4,
+        -94.61
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        -34.1006,
+        -13.3571,
+        -50.9354
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     },
+     "position": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.6000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.6500": {
+       "vector": [
+        0.3413,
+        0.1707,
+        -0.3413
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.7000": {
+       "vector": [
+        1.3653,
+        0.6827,
+        -1.3653
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.7500": {
+       "vector": [
+        2.9013,
+        1.4507,
+        -2.9013
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.8000": {
+       "vector": [
+        3.9253,
+        1.9627,
+        -3.9253
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.8500": {
+       "vector": [
+        4.2667,
+        2.1333,
+        -4.2667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.1000": {
+       "vector": [
+        4.2667,
+        2.1333,
+        -4.2667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.1500": {
+       "vector": [
+        -2.4889,
+        1.0074,
+        -4.2667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.2000": {
+       "vector": [
+        -4.9778,
+        0.5926,
+        -4.2667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.2500": {
+       "vector": [
+        -5.3333,
+        0.5333,
+        -4.2667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.5500": {
+       "vector": [
+        -5.3333,
+        0.0,
+        -4.2667
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    },
+    "left_arm": {
+     "rotation": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2000": {
+       "vector": [
+        17.5,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        29.3521,
+        -40.3323,
+        -23.1638
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.8500": {
+       "vector": [
+        29.3521,
+        -40.3323,
+        -23.1638
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.5500": {
+       "vector": [
+        29.3521,
+        -40.3323,
+        -23.1638
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        7.0952,
+        -54.6898,
+        -8.6726
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.9500": {
+       "vector": [
+        -10.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.1500": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     },
+     "position": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.2000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        -1.0667,
+        0.0,
+        3.2
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        -1.0667,
+        0.0,
+        3.2
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.1000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    },
+    "right_leg": {
+     "rotation": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5000": {
+       "vector": [
+        5.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7000": {
+       "vector": [
+        5.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.0500": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    },
+    "left_leg": {
+     "rotation": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.1500": {
+       "vector": [
+        17.5,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3500": {
+       "vector": [
+        -20.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5500": {
+       "vector": [
+        -7.5,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        -7.5,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        -15.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.1000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     },
+     "position": {
+      "0.0000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.1500": {
+       "vector": [
+        0.0,
+        1.0667,
+        -1.0667
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.3500": {
+       "vector": [
+        0.0,
+        1.0667,
+        -2.1333
+       ],
+       "lerp_mode": "linear"
+      },
+      "0.5500": {
+       "vector": [
+        0.0,
+        0.0,
+        -3.2
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.7500": {
+       "vector": [
+        0.0,
+        0.0,
+        -3.2
+       ],
+       "lerp_mode": "linear"
+      },
+      "1.8500": {
+       "vector": [
+        0.0,
+        1.0667,
+        -2.2827
+       ],
+       "lerp_mode": "linear"
+      },
+      "2.1000": {
+       "vector": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "lerp_mode": "linear"
+      }
+     }
+    }
+   }
+  }
+ }
+}
