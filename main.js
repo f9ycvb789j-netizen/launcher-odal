@@ -59,7 +59,7 @@ const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
   { name: 'islandfactionsgui-2.6.2.jar', sha256: '9ac8c2f418098a73de7fed05f9598ff89d250f2cfeb60fe161c21133f984bcfc' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
-  { name: 'odalcompanion-2.9.0.jar', sha256: '06288443af9581ab4d9259f2db24488fb05f21096bf8099333f78dda03740eb3' },
+  { name: 'odalcompanion-2.9.1.jar', sha256: 'cf32cb1ccfbbb19ebb6e969c290196d0428322da5d7752a7fa1de1111f5bb69d' },
 ];
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
