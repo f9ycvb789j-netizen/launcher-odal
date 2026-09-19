@@ -57,7 +57,7 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 // pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
 const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-2.7.0.jar', sha256: 'a145ec495a069f52a61a818b1b0591310dfa81bbedd8c9c6f6785334a83b2f1d' },
+  { name: 'islandfactionsgui-2.7.1.jar', sha256: 'dea0b244da52f91a633fb698aabe02a2b5695d4617937bd571b6e92ffa9b6b5a' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
   { name: 'odalcompanion-2.9.4.jar', sha256: 'f75ddba53b31f5c09d201bc5605e68076d8f949fd7146a1880f4b0cc5bf09c0a' },
 ];
@@ -377,7 +377,7 @@ ipcMain.handle('login-with-saved-account', async (event, username) => {
   try {
     const result = await httpsPost(`https://${SITE_API}/api/launcher_auth.php`, { username: account.username, password: account.password });
     if (result.error) return { success: false, error: result.error };
-    currentUser = { username: result.username };
+    currentUser = { username: result.username, token: result.token };
     setLastAccount(result.username);
     return { success: true, username: result.username, grade: result.grade };
   } catch (err) {
@@ -419,7 +419,7 @@ ipcMain.handle('login-site', async (event, username, password) => {
   try {
     const result = await httpsPost(`https://${SITE_API}/api/launcher_auth.php`, { username, password });
     if (result.error) return { success: false, error: result.error };
-    currentUser = { username: result.username };
+    currentUser = { username: result.username, token: result.token };
     return { success: true, username: result.username, grade: result.grade };
   } catch (err) {
     return { success: false, error: 'Impossible de contacter le serveur Odal' };
@@ -434,7 +434,7 @@ ipcMain.handle('register-site', async (event, mc_username, email, password) => {
     const session = await httpsPost(`https://${SITE_API}/api/launcher_auth.php`, { username: mc_username, password });
     if (session.error) return { success: false, error: 'Compte créé, mais session de jeu impossible : ' + session.error };
 
-    currentUser = { username: result.mc_username };
+    currentUser = { username: result.mc_username, token: session.token };
     return { success: true, username: result.mc_username, grade: session.grade };
   } catch (err) {
     return { success: false, error: 'Impossible de contacter le serveur Odal' };
@@ -511,6 +511,24 @@ ipcMain.handle('launch', async (event) => {
   const auth = currentUser ? Authenticator.getAuth(currentUser.username) : Authenticator.getAuth('Joueur');
   const settings = loadSettings();
 
+  // La session du site dure 24 h : on la rouvre a chaque lancement quand le compte est
+  // enregistre, pour que le jeton transmis au jeu soit toujours frais.
+  if (currentUser) {
+    const saved = loadAccounts().find((a) => a.username.toLowerCase() === currentUser.username.toLowerCase());
+    if (saved) {
+      try {
+        const fresh = await httpsPost(`https://${SITE_API}/api/launcher_auth.php`, { username: saved.username, password: saved.password });
+        if (fresh && fresh.token) currentUser.token = fresh.token;
+      } catch (err) {
+        logToFile('AUTH', 'Session non renouvelee : ' + err.message);
+      }
+    }
+  }
+  // Le jeton part au jeu ; le mod Odal le renvoie au serveur, et OdalAuth refuse quiconque
+  // ne l'a pas : c'est ce qui empeche de se connecter sous le pseudo d'un autre.
+  const jvmArgs = (profil.arguments && profil.arguments.jvm || []).filter((a) => typeof a === 'string');
+  if (currentUser && currentUser.token) jvmArgs.push(`-Dodal.session=${currentUser.token}`);
+
   await launcher.launch({
     authorization: auth,
     root: GAME_DIR,
@@ -523,7 +541,7 @@ ipcMain.handle('launch', async (event) => {
     // MCLC applique bien les arguments JEU du JSON custom, mais pas ses
     // arguments JVM : on ne transmet donc que ces derniers (lecon du profil
     // NeoForge, valable pour le -DFabricMcEmu du profil Fabric).
-    customArgs: (profil.arguments && profil.arguments.jvm || []).filter((a) => typeof a === 'string'),
+    customArgs: jvmArgs,
     memory: { max: `${settings.ramGB}G`, min: '1G' }
   });
 
