@@ -9,3 +9,6 @@ backups/
 dist-domain-info/
 release-*/
 icon-large-preview*.png
+
+# Ancien pack NeoForge 1.21.4 (144 Mo) : garde en local, hors du depot public.
+mods-pack-1.21.4/

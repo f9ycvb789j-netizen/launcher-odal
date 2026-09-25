@@ -5,7 +5,7 @@ const https = require('https');
 const crypto = require('crypto');
 const { isNewerVersion } = require('./updater-utils');
 const { getPlatformMods } = require('./mod-platform');
-const { ensureDistantHorizonsDefault } = require('./distant-horizons-config');
+const { ensureDistantHorizonsDefault, disableDistantHorizonsAutoUpdate } = require('./distant-horizons-config');
 const { ensureShoulderSurfingDefault } = require('./shoulder-surfing-config');
 const { ensureCustomSkinLoaderConfig } = require('./custom-skin-loader-config');
 const { ensureBundledResourcePacks, ensureBundledEmotes, ensureEmoteKeyFree } = require('./resource-packs');
@@ -57,7 +57,7 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 // pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
 const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-2.7.1.jar', sha256: 'dea0b244da52f91a633fb698aabe02a2b5695d4617937bd571b6e92ffa9b6b5a' },
+  { name: 'islandfactionsgui-3.1.0.jar', sha256: '738ff57c99d2427e9d518999152dc6be3d3bc3f2e5e862e3f6fb27586ac864ca' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
   { name: 'odalcompanion-2.9.4.jar', sha256: 'f75ddba53b31f5c09d201bc5605e68076d8f949fd7146a1880f4b0cc5bf09c0a' },
 ];
@@ -462,6 +462,8 @@ ipcMain.handle('launch', async (event) => {
   send(event, 'progress', 45);
   await syncMods(modsDir, event);
   ensureDistantHorizonsDefault(GAME_DIR);
+  // Distant Horizons se mettait a jour tout seul par-dessus la version epinglee : plus jamais.
+  disableDistantHorizonsAutoUpdate(GAME_DIR);
   ensureShoulderSurfingDefault(GAME_DIR);
   ensureCustomSkinLoaderConfig(GAME_DIR);
   ensureBundledResourcePacks(GAME_DIR, path.join(__dirname, 'resourcepacks-pack'));

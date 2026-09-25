@@ -1,0 +1,94 @@
+[
+  {
+    "name": "AmbientSounds_NEOFORGE_v6.3.4_mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/fM515JnW/versions/mNY9eDUK/AmbientSounds_NEOFORGE_v6.3.4_mc1.21.11.jar"
+  },
+  {
+    "name": "CreativeCore_NEOFORGE_v2.14.10_mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/OsZiaDHq/versions/yT7wW5Kc/CreativeCore_NEOFORGE_v2.14.10_mc1.21.11.jar"
+  },
+  {
+    "name": "CustomSkinLoader_Universal-15.0.1.jar",
+    "url": "https://cdn.modrinth.com/data/idMHQ4n2/versions/OLaesh5y/CustomSkinLoader_Universal-15.0.1.jar"
+  },
+  {
+    "name": "DistantHorizons-3.2.0-b-1.21.11-fabric-neoforge.jar",
+    "url": "https://cdn.modrinth.com/data/uCdwusMi/versions/bCTilxSz/DistantHorizons-3.2.0-b-1.21.11-fabric-neoforge.jar"
+  },
+  {
+    "name": "ShoulderSurfing-NeoForge-1.21.11-5.0.10.jar",
+    "url": "https://cdn.modrinth.com/data/kepjj2sy/versions/PnwHPPor/ShoulderSurfing-NeoForge-1.21.11-5.0.10.jar"
+  },
+  {
+    "name": "chat_heads-1.2.8-neoforge-1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/Wb5oqrBJ/versions/zIcRq2pG/chat_heads-1.2.8-neoforge-1.21.11.jar"
+  },
+  {
+    "name": "entity_model_features-3.3.5-1.21.11-neoforge.jar",
+    "url": "https://cdn.modrinth.com/data/4I1XuqiY/versions/Gb7hFNKJ/entity_model_features-3.3.5-1.21.11-neoforge.jar"
+  },
+  {
+    "name": "entity_texture_features-7.2.1-1.21.11-neoforge.jar",
+    "url": "https://cdn.modrinth.com/data/BVzZfTc1/versions/pN2cxTrU/entity_texture_features-7.2.1-1.21.11-neoforge.jar"
+  },
+  {
+    "name": "forgematica-0.4.3+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/dCKRaeBC/versions/BJ65xT0w/forgematica-0.4.3%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "iris-neoforge-1.10.7+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/v6TgIIUM/iris-neoforge-1.10.7%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "jei-1.21.11-neoforge-27.36.0.93.jar",
+    "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/4AfQ1YT9/jei-1.21.11-neoforge-27.36.0.93.jar"
+  },
+  {
+    "name": "mafglib-0.4.5+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/SKI34J7B/versions/SvPK1yWT/mafglib-0.4.5%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "notenoughanimations-neoforge-1.12.4-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/MPCX6s5C/versions/U4Tof5MK/notenoughanimations-neoforge-1.12.4-mc1.21.11.jar"
+  },
+  {
+    "name": "skinlayers3d-neoforge-1.11.2-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/zV5r3pPn/versions/2utRsDcM/skinlayers3d-neoforge-1.11.2-mc1.21.11.jar"
+  },
+  {
+    "name": "smoothswapping-0.9.8-1.21.11-neoforge.jar",
+    "url": "https://cdn.modrinth.com/data/ydZic5r4/versions/zeyHbfmq/smoothswapping-0.9.8-1.21.11-neoforge.jar"
+  },
+  {
+    "name": "sodium-neoforge-0.8.14+mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/AANobbMI/versions/sC6wj32u/sodium-neoforge-0.8.14%2Bmc1.21.11.jar"
+  },
+  {
+    "name": "voicechat-neoforge-1.21.11-2.6.22.jar",
+    "url": "https://cdn.modrinth.com/data/9eGKb6K1/versions/k7nBzwiA/voicechat-neoforge-1.21.11-2.6.22.jar"
+  },
+  {
+    "name": "xaerominimap-neoforge-1.21.11-26.4.2.jar",
+    "url": "https://cdn.modrinth.com/data/1bokaNcj/versions/ijlOlFLF/xaerominimap-neoforge-1.21.11-26.4.2.jar"
+  },
+  {
+    "name": "xaeroworldmap-neoforge-1.21.11-1.45.0.jar",
+    "url": "https://cdn.modrinth.com/data/NcUtCpym/versions/OD3jdfif/xaeroworldmap-neoforge-1.21.11-1.45.0.jar"
+  },
+  {
+    "name": "yet_another_config_lib_v3-3.8.2+1.21.11-neoforge.jar",
+    "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/HZs9mrWM/yet_another_config_lib_v3-3.8.2%2B1.21.11-neoforge.jar"
+  },
+  {
+    "name": "punchy-2.7e-neoforge-1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/8aoMKplv/versions/scMOPh9u/punchy-2.7e-neoforge-1.21.11.jar"
+  },
+  {
+    "name": "firstperson-neoforge-2.7.2-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/H5XMjpHi/versions/TKoHJWZZ/firstperson-neoforge-2.7.2-mc1.21.11.jar"
+  },
+  {
+    "name": "waveycapes-neoforge-1.10.2-mc1.21.11.jar",
+    "url": "https://cdn.modrinth.com/data/kYuIpRLv/versions/xwBvrqy6/waveycapes-neoforge-1.10.2-mc1.21.11.jar"
+  }
+]
