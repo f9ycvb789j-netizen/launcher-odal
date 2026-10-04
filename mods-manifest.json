@@ -52,7 +52,7 @@
     "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/fDpuVzVr/iris-fabric-1.10.7%2Bmc1.21.11.jar"
   },
   {
-    "name": "islandfactionsgui-3.1.0.jar",
+    "name": "islandfactionsgui-3.3.0.jar",
     "url": "URL_A_REMPLIR"
   },
   {
@@ -116,15 +116,11 @@
     "url": "https://cdn.modrinth.com/data/kYuIpRLv/versions/8988sloO/waveycapes-fabric-1.11.0-mc1.21.11.jar"
   },
   {
-    "name": "xaerominimap-fabric-1.21.11-26.4.2.jar",
-    "url": "https://cdn.modrinth.com/data/1bokaNcj/versions/8MdqDp18/xaerominimap-fabric-1.21.11-26.4.2.jar"
-  },
-  {
-    "name": "xaeroworldmap-fabric-1.21.11-1.45.0.jar",
-    "url": "https://cdn.modrinth.com/data/NcUtCpym/versions/4PX8T9We/xaeroworldmap-fabric-1.21.11-1.45.0.jar"
-  },
-  {
     "name": "yet_another_config_lib_v3-3.8.2+1.21.11-fabric.jar",
     "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/pHWDw3Vc/yet_another_config_lib_v3-3.8.2%2B1.21.11-fabric.jar"
+  },
+  {
+    "name": "odalcarte-2.4.1.jar",
+    "url": "URL_A_REMPLIR"
   }
 ]
