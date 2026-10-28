@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
+// Version du format d'options.txt de Minecraft 1.21.11 (celle que le jeu lui-meme ecrit).
+// A relever en meme temps que MINECRAFT_VERSION dans main.js.
+const OPTIONS_VERSION = 4671;
+
 /**
  * Packs de ressources livres avec le launcher (resourcepacks-pack/), copies dans le dossier
  * de jeu et actives dans options.txt s'ils n'y sont pas encore.
@@ -25,6 +29,13 @@ function ensureBundledResourcePacks(gameDir, packDir) {
 
   const optionsFile = path.join(gameDir, 'options.txt');
   let lines = fs.existsSync(optionsFile) ? fs.readFileSync(optionsFile, 'utf8').split(/\r?\n/) : [];
+  // Sans ligne `version:`, Minecraft prend le fichier pour un options.txt d'avant 1.13 et lui
+  // passe le correcteur de donnees des touches, qui lit chaque valeur comme un entier : le
+  // fichier entier est alors rejete (« Failed to load options ») et nos packs ne s'activent
+  // jamais. Sur une installation neuve, c'est nous qui creons le fichier : on l'annonce.
+  if (!lines.some((l) => l.startsWith('version:'))) {
+    lines.unshift('version:' + OPTIONS_VERSION);
+  }
   const index = lines.findIndex((l) => l.startsWith('resourcePacks:'));
   let current = [];
   if (index >= 0) {
@@ -61,24 +72,4 @@ function ensureBundledEmotes(gameDir, packDir) {
   return copied;
 }
 
-/**
- * Emotecraft ouvre sa roue sur B, touche que Xaero Minimap prend aussi pour « nouveau
- * waypoint » ; Xaero l'emporte et la roue ne s'ouvre jamais. On libere donc B cote Xaero,
- * seulement si le joueur ne l'a pas deja regle ailleurs (ligne absente ou encore sur B) :
- * le waypoint instantane (+ du pave numerique) et la liste (U) restent disponibles.
- */
-function ensureEmoteKeyFree(gameDir) {
-  const optionsFile = path.join(gameDir, 'options.txt');
-  const cle = 'key_gui.xaero_new_waypoint:';
-  const lines = fs.existsSync(optionsFile) ? fs.readFileSync(optionsFile, 'utf8').split(/\r?\n/) : [];
-  const index = lines.findIndex((l) => l.startsWith(cle));
-  if (index >= 0 && lines[index] !== cle + 'key.keyboard.b') return false;
-  const line = cle + 'key.keyboard.unknown';
-  while (lines.length && lines[lines.length - 1] === '') lines.pop();
-  if (index >= 0) lines[index] = line;
-  else lines.push(line);
-  fs.writeFileSync(optionsFile, lines.join('\n') + '\n', 'utf8');
-  return true;
-}
-
-module.exports = { ensureBundledResourcePacks, ensureBundledEmotes, ensureEmoteKeyFree };
+module.exports = { ensureBundledResourcePacks, ensureBundledEmotes };

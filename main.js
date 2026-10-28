@@ -8,7 +8,7 @@ const { getPlatformMods } = require('./mod-platform');
 const { ensureDistantHorizonsDefault, disableDistantHorizonsAutoUpdate } = require('./distant-horizons-config');
 const { ensureShoulderSurfingDefault } = require('./shoulder-surfing-config');
 const { ensureCustomSkinLoaderConfig } = require('./custom-skin-loader-config');
-const { ensureBundledResourcePacks, ensureBundledEmotes, ensureEmoteKeyFree } = require('./resource-packs');
+const { ensureBundledResourcePacks, ensureBundledEmotes } = require('./resource-packs');
 
 // Sur Windows : remplacer java.exe par javaw.exe (sans fenêtre console)
 const cp = require('child_process');
@@ -472,7 +472,6 @@ ipcMain.handle('launch', async (event) => {
   ensureBundledResourcePacks(GAME_DIR, path.join(__dirname, 'resourcepacks-pack'));
   // Emotes Emotecraft (pack Izzy converti) : plugin Emotecraft cote serveur, mod cote client.
   ensureBundledEmotes(GAME_DIR, path.join(__dirname, 'emotes-pack'));
-  ensureEmoteKeyFree(GAME_DIR);
 
   writeServersDat(GAME_DIR);
 
