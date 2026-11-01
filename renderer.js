@@ -514,3 +514,13 @@ function setStatus(msg) {
     container.appendChild(p);
   }
 })();
+
+// L'etiquette en bas a droite disait « v1.0.0 » en dur, quelle que soit la version installee :
+// elle lit maintenant la vraie version du launcher.
+(async () => {
+  try {
+    const v = await window.launcher.getVersion();
+    const el = document.getElementById('version');
+    if (el && v) el.textContent = 'v' + v;
+  } catch (_) {}
+})();

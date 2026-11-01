@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, safeStorage, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, safeStorage, dialog, net } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -66,6 +66,18 @@ const REQUIRED_MODS = [
 ];
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
+
+/** La raison d'un echec reseau, en clair pour le joueur (et dans odal-launcher.log pour nous). */
+function raisonReseau(err) {
+  const msg = err && err.message ? err.message : String(err);
+  if (/timeout/i.test(msg)) return 'le site ne répond pas (délai dépassé)';
+  if (/ENOTFOUND|ERR_NAME_NOT_RESOLVED/i.test(msg)) return 'nom odalmc.fr introuvable (DNS)';
+  if (/CERT|certificate|ERR_CERT/i.test(msg)) return 'certificat refusé (antivirus ou proxy qui inspecte le HTTPS)';
+  if (/ECONNREFUSED|ERR_CONNECTION_REFUSED|ERR_CONNECTION_RESET|ECONNRESET/i.test(msg)) return 'connexion refusée ou coupée (pare-feu ?)';
+  if (/HTTP 403/.test(msg)) return 'accès refusé par le pare-feu de l\'hébergeur (HTTP 403)';
+  if (/HTTP 5\d\d/.test(msg)) return 'erreur du site (' + msg.replace(/.*(HTTP 5\d\d).*/, '$1') + ')';
+  return msg;
+}
 
 function logToFile(scope, value) {
   try {
@@ -240,6 +252,7 @@ ipcMain.on('minimize', () => mainWindow.minimize());
 ipcMain.on('close', () => app.quit());
 ipcMain.on('open-url', (e, url) => shell.openExternal(url));
 
+ipcMain.handle('get-version', () => CURRENT_VERSION);
 ipcMain.handle('get-site-api', () => SITE_API);
 ipcMain.handle('retry-update', async () => {
   await checkForUpdates();
@@ -287,7 +300,8 @@ ipcMain.handle('upload-skin', async (event, filePath) => {
     if (result.error) return { success: false, error: result.error };
     return { success: true };
   } catch (err) {
-    return { success: false, error: 'Impossible de contacter le serveur Odal' };
+    logToFile('site', err);
+    return { success: false, error: 'Impossible de contacter le serveur Odal : ' + raisonReseau(err) };
   }
 });
 
@@ -384,7 +398,8 @@ ipcMain.handle('login-with-saved-account', async (event, username) => {
     setLastAccount(result.username);
     return { success: true, username: result.username, grade: result.grade };
   } catch (err) {
-    return { success: false, error: 'Impossible de contacter le serveur Odal' };
+    logToFile('site', err);
+    return { success: false, error: 'Impossible de contacter le serveur Odal : ' + raisonReseau(err) };
   }
 });
 
@@ -425,7 +440,8 @@ ipcMain.handle('login-site', async (event, username, password) => {
     currentUser = { username: result.username, token: result.token };
     return { success: true, username: result.username, grade: result.grade };
   } catch (err) {
-    return { success: false, error: 'Impossible de contacter le serveur Odal' };
+    logToFile('site', err);
+    return { success: false, error: 'Impossible de contacter le serveur Odal : ' + raisonReseau(err) };
   }
 });
 
@@ -440,7 +456,8 @@ ipcMain.handle('register-site', async (event, mc_username, email, password) => {
     currentUser = { username: result.mc_username, token: session.token };
     return { success: true, username: result.mc_username, grade: session.grade };
   } catch (err) {
-    return { success: false, error: 'Impossible de contacter le serveur Odal' };
+    logToFile('site', err);
+    return { success: false, error: 'Impossible de contacter le serveur Odal : ' + raisonReseau(err) };
   }
 });
 
@@ -829,16 +846,43 @@ function send(event, channel, data) {
   }
 }
 
-function httpsGetOnce(url, timeoutMs) {
+// Les appels au site passent par la pile reseau de Chromium (electron.net), pas par le module
+// https de Node : Chromium lit le magasin de certificats de Windows et les reglages de proxy du
+// systeme. Un antivirus qui inspecte le HTTPS ou un proxy d'entreprise, invisibles pour le
+// navigateur, faisaient echouer Node avec un certificat inconnu — et le joueur ne pouvait plus se
+// connecter sans desactiver sa protection.
+function netRequest(method, url, body, timeoutMs) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, { timeout: timeoutMs, headers: { 'User-Agent': USER_AGENT } }, (res) => {
+    let termine = false;
+    const finir = (fn, valeur) => {
+      if (termine) return;
+      termine = true;
+      clearTimeout(minuterie);
+      fn(valeur);
+    };
+    const req = net.request({ method, url, headers: body != null
+      ? { 'Content-Type': 'application/json', 'User-Agent': USER_AGENT }
+      : { 'User-Agent': USER_AGENT } });
+    const minuterie = setTimeout(() => {
+      try { req.abort(); } catch (_) {}
+      finir(reject, new Error('Le serveur ne répond pas (timeout)'));
+    }, timeoutMs);
+    req.on('response', (res) => {
       let raw = '';
-      res.on('data', c => raw += c);
-      res.on('end', () => resolve(raw));
+      res.on('data', (c) => { raw += c; });
+      res.on('end', () => finir(resolve, { status: res.statusCode, body: raw }));
+      res.on('error', (err) => finir(reject, err));
     });
-    req.on('timeout', () => req.destroy(new Error('Le serveur ne répond pas (timeout)')));
-    req.on('error', reject);
+    req.on('error', (err) => finir(reject, err));
+    if (body != null) req.write(body);
+    req.end();
   });
+}
+
+async function httpsGetOnce(url, timeoutMs) {
+  const res = await netRequest('GET', url, null, timeoutMs);
+  if (res.status < 200 || res.status >= 300) throw new Error('HTTP ' + res.status);
+  return res.body;
 }
 
 async function httpsGet(url, retries = 1, timeoutMs = 10000) {
@@ -850,29 +894,14 @@ async function httpsGet(url, retries = 1, timeoutMs = 10000) {
   }
 }
 
-function httpsPostOnce(url, data, timeoutMs) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify(data);
-    const u = new URL(url);
-    const req = https.request({
-      hostname: u.hostname,
-      path: u.pathname,
-      method: 'POST',
-      timeout: timeoutMs,
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), 'User-Agent': USER_AGENT }
-    }, (res) => {
-      let raw = '';
-      res.on('data', c => raw += c);
-      res.on('end', () => {
-        try { resolve(JSON.parse(raw)); }
-        catch(e) { reject(new Error('Réponse invalide')); }
-      });
-    });
-    req.on('timeout', () => req.destroy(new Error('Le serveur ne répond pas (timeout)')));
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+async function httpsPostOnce(url, data, timeoutMs) {
+  const res = await netRequest('POST', url, JSON.stringify(data), timeoutMs);
+  try {
+    return JSON.parse(res.body);
+  } catch (e) {
+    // Une page HTML a la place du JSON : pare-feu de l'hebergeur, page d'erreur, proxy...
+    throw new Error('Réponse invalide (HTTP ' + res.status + ')');
+  }
 }
 
 // TigerProtect (pare-feu o2switch) bloque toute 2e requete arrivant trop vite apres la
