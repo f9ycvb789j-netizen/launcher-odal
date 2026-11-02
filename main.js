@@ -869,9 +869,11 @@ function netRequest(method, url, body, timeoutMs) {
     // antivirus, pare-feu de l'hebergeur). Les cookies de session sont envoyes : certaines
     // protections posent un cookie puis redirigent vers la meme adresse, et sans cookie ca boucle.
     const redirections = [];
-    const req = net.request({ method, url, redirect: 'manual', useSessionCookies: true, headers: body != null
-      ? { 'Content-Type': 'application/json', 'User-Agent': USER_AGENT }
-      : { 'User-Agent': USER_AGENT } });
+    // Jamais de cache : sans ces en-tetes, Chromium resservait un version.json vieux de plusieurs
+    // heures (fraicheur heuristique sur Last-Modified) et le launcher ne voyait pas la mise a jour.
+    const entetes = { 'User-Agent': USER_AGENT, 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' };
+    if (body != null) entetes['Content-Type'] = 'application/json';
+    const req = net.request({ method, url, redirect: 'manual', useSessionCookies: true, headers: entetes });
     req.on('redirect', (statusCode, methode, cible) => {
       redirections.push(cible);
       logToFile('REDIRECT', `${statusCode} ${methode} ${url} -> ${cible}`);
