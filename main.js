@@ -75,6 +75,10 @@ function raisonReseau(err) {
   if (/CERT|certificate|ERR_CERT/i.test(msg)) return 'certificat refusé (antivirus ou proxy qui inspecte le HTTPS)';
   if (/ECONNREFUSED|ERR_CONNECTION_REFUSED|ERR_CONNECTION_RESET|ECONNRESET/i.test(msg)) return 'connexion refusée ou coupée (pare-feu ?)';
   if (/HTTP 403/.test(msg)) return 'accès refusé par le pare-feu de l\'hébergeur (HTTP 403)';
+  if (/TOO_MANY_REDIRECTS/i.test(msg)) {
+    const cible = (msg.match(/vers (\S+)/) || [])[1];
+    return 'le site redirige en boucle' + (cible ? ' vers ' + cible : '') + ' (proxy, antivirus ou pare-feu de l\'hébergeur)';
+  }
   if (/HTTP 5\d\d/.test(msg)) return 'erreur du site (' + msg.replace(/.*(HTTP 5\d\d).*/, '$1') + ')';
   return msg;
 }
@@ -860,9 +864,23 @@ function netRequest(method, url, body, timeoutMs) {
       clearTimeout(minuterie);
       fn(valeur);
     };
-    const req = net.request({ method, url, headers: body != null
+    // Redirections suivies a la main (5 au plus) : chaque cible est journalisee, et le message
+    // d'erreur la cite — un ERR_TOO_MANY_REDIRECTS nu ne disait pas QUI redirigeait (proxy,
+    // antivirus, pare-feu de l'hebergeur). Les cookies de session sont envoyes : certaines
+    // protections posent un cookie puis redirigent vers la meme adresse, et sans cookie ca boucle.
+    const redirections = [];
+    const req = net.request({ method, url, redirect: 'manual', useSessionCookies: true, headers: body != null
       ? { 'Content-Type': 'application/json', 'User-Agent': USER_AGENT }
       : { 'User-Agent': USER_AGENT } });
+    req.on('redirect', (statusCode, methode, cible) => {
+      redirections.push(cible);
+      logToFile('REDIRECT', `${statusCode} ${methode} ${url} -> ${cible}`);
+      if (redirections.length > 5) {
+        try { req.abort(); } catch (_) {}
+        return finir(reject, new Error('ERR_TOO_MANY_REDIRECTS vers ' + cible));
+      }
+      req.followRedirect();
+    });
     const minuterie = setTimeout(() => {
       try { req.abort(); } catch (_) {}
       finir(reject, new Error('Le serveur ne répond pas (timeout)'));
@@ -873,7 +891,12 @@ function netRequest(method, url, body, timeoutMs) {
       res.on('end', () => finir(resolve, { status: res.statusCode, body: raw }));
       res.on('error', (err) => finir(reject, err));
     });
-    req.on('error', (err) => finir(reject, err));
+    req.on('error', (err) => {
+      if (redirections.length && err && !/TOO_MANY_REDIRECTS/.test(err.message || '')) {
+        err.message = (err.message || String(err)) + ' (apres redirection vers ' + redirections[redirections.length - 1] + ')';
+      }
+      finir(reject, err);
+    });
     if (body != null) req.write(body);
     req.end();
   });
