@@ -902,8 +902,72 @@ function netRequest(method, url, body, timeoutMs) {
   });
 }
 
+// Second chemin : la pile Node (module https). Elle ignore le proxy systeme et le magasin de
+// certificats de Windows — c'est precisement ce qui en fait une issue de secours quand la pile
+// Chromium tourne en rond (proxy, PAC, controle parental, protection qui redirige). Et l'inverse
+// est vrai : un antivirus qui inspecte le HTTPS fait echouer Node mais pas Chromium. Les deux piles
+// sont essayees dans l'ordre, sans rien demander au joueur. Redirections suivies a la main (5 max)
+// et journalisees comme pour netRequest.
+function nodeRequest(method, url, body, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const redirections = [];
+    const lancer = (methode, cible, corps) => {
+      const u = new URL(cible);
+      const mod = u.protocol === 'https:' ? https : require('http');
+      const entetes = { 'User-Agent': USER_AGENT };
+      if (corps != null) {
+        entetes['Content-Type'] = 'application/json';
+        entetes['Content-Length'] = Buffer.byteLength(corps);
+      }
+      const req = mod.request({ hostname: u.hostname, port: u.port || undefined, path: u.pathname + u.search,
+        method: methode, timeout: timeoutMs, headers: entetes }, (res) => {
+        const statut = res.statusCode;
+        if ([301, 302, 303, 307, 308].includes(statut) && res.headers.location) {
+          res.resume();
+          const suivante = new URL(res.headers.location, cible).toString();
+          redirections.push(suivante);
+          logToFile('REDIRECT-NODE', `${statut} ${methode} ${cible} -> ${suivante}`);
+          if (redirections.length > 5) return reject(new Error('ERR_TOO_MANY_REDIRECTS vers ' + suivante));
+          // Comme un navigateur : 301/302/303 repartent en GET sans corps, 307/308 gardent tout.
+          const garder = statut === 307 || statut === 308;
+          return lancer(garder ? methode : 'GET', suivante, garder ? corps : null);
+        }
+        let raw = '';
+        res.on('data', (c) => { raw += c; });
+        res.on('end', () => resolve({ status: statut, body: raw }));
+        res.on('error', reject);
+      });
+      req.on('timeout', () => req.destroy(new Error('Le serveur ne répond pas (timeout)')));
+      req.on('error', reject);
+      if (corps != null) req.write(corps);
+      req.end();
+    };
+    lancer(method, url, body);
+  });
+}
+
+async function requeteSite(method, url, body, timeoutMs) {
+  let premiere;
+  try {
+    return await netRequest(method, url, body, timeoutMs);
+  } catch (err) {
+    premiere = err;
+    logToFile('site', `pile Chromium en echec (${err && err.message}) — second essai par la pile Node`);
+  }
+  try {
+    const res = await nodeRequest(method, url, body, timeoutMs);
+    logToFile('site', 'pile Node : reponse HTTP ' + res.status);
+    return res;
+  } catch (err2) {
+    logToFile('site', `pile Node en echec aussi (${err2 && err2.message})`);
+    const e = new Error((premiere && premiere.message) || String(premiere));
+    e.secondEssai = err2;
+    throw e;
+  }
+}
+
 async function httpsGetOnce(url, timeoutMs) {
-  const res = await netRequest('GET', url, null, timeoutMs);
+  const res = await requeteSite('GET', url, null, timeoutMs);
   if (res.status < 200 || res.status >= 300) throw new Error('HTTP ' + res.status);
   return res.body;
 }
@@ -918,7 +982,7 @@ async function httpsGet(url, retries = 1, timeoutMs = 10000) {
 }
 
 async function httpsPostOnce(url, data, timeoutMs) {
-  const res = await netRequest('POST', url, JSON.stringify(data), timeoutMs);
+  const res = await requeteSite('POST', url, JSON.stringify(data), timeoutMs);
   try {
     return JSON.parse(res.body);
   } catch (e) {
