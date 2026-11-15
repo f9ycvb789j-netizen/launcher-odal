@@ -62,7 +62,7 @@ const REQUIRED_MODS = [
   { name: 'odalcompanion-2.13.3.jar', sha256: 'b394dcb8a2ac85263929bb7c907aff08f607fc992bf62d5dadfe053b2a149af9' },
   // Carte d'Odal : la Dynmap en jeu, minimap, reperes et claims a la souris. Remplace Xaero ;
   // epinglee comme les autres mods maison, le plugin IslandFactions parle son protocole.
-  { name: 'odalcarte-2.7.4.jar', sha256: '61b4aa6b93d15b4b473dcf03e812b607a511502f5920662f2235749b9f23c1f5' },
+  { name: 'odalcarte-2.7.5.jar', sha256: '470509504c0d44a078655eec82544cdb75c0ff5fd6bfc54ec03f91fac43783a4' },
 ];
 const LAUNCHER_LOG_DIR = path.join(GAME_DIR, 'logs');
 const LAUNCHER_LOG_FILE = path.join(LAUNCHER_LOG_DIR, 'odal-launcher.log');
