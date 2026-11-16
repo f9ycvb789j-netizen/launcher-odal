@@ -9,6 +9,9 @@ const path = require('path');
  *    ce qui ne suffit pas pour voir un navire ou une monture en entier ;
  *  - `replace_default_perspective = true` : sinon la vue du mod s'AJOUTE au cycle de F5 et il
  *    faut trois appuis pour l'atteindre ;
+ *  - `default_perspective = "FIRST_PERSON"` (16/11/2026, Loky) : on demarre en premiere personne.
+ *    Avant, la vue du mod etait la vue de depart, et un joueur sur Mac, ou F5 est la touche de
+ *    luminosite, ne savait pas en sortir ;
  *  - `adjust_player_transparency = false` : le mod estompe le joueur quand la vue est obstruee,
  *    mais avec Iris et un shader ce rendu ne passe pas et le corps devient carrement invisible.
  *
@@ -27,7 +30,7 @@ const DEFAULT_CONFIG = `[camera]
 	adjust_player_transparency = false
 
 [perspective]
-	default_perspective = "SHOULDER_SURFING"
+	default_perspective = "FIRST_PERSON"
 	replace_default_perspective = true
 `;
 
