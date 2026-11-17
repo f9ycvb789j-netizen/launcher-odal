@@ -57,7 +57,7 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 // pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
 const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-3.3.1.jar', sha256: 'c54eb017a7e4bc3b17b52fa8079456db685211121b0b7d74fd83fb797e6c7e82' },
+  { name: 'islandfactionsgui-3.4.0.jar', sha256: '8fc011fb702c7e17caacf46bf500db9f3fdec8f223a5a7d84b79ccce4f9fec70' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
   { name: 'odalcompanion-2.13.3.jar', sha256: 'b394dcb8a2ac85263929bb7c907aff08f607fc992bf62d5dadfe053b2a149af9' },
   // Carte d'Odal : la Dynmap en jeu, minimap, reperes et claims a la souris. Remplace Xaero ;
