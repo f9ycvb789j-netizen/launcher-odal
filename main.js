@@ -57,9 +57,11 @@ const GAME_DIR = path.join(app.getPath('appData'), '.odalpaper');
 // pas de build NeoForge 1.21.4 ; ajouter { name, sha256 } des qu'ils existent.
 const REQUIRED_MODS = [
   // 2.2.x = builds Fabric (les 2.1.0/1.0.0 etaient les builds NeoForge, conserves dans paper/mods-neoforge).
-  { name: 'islandfactionsgui-3.4.3.jar', sha256: '3722b62daa542fddb4ed5a89c58aacef04e03673e9c9fb2eaf114b005e67059b' },
+  // 3.4.10 (17/11 soir, + tuiles verrouillees et fleche du tutoriel) : Menu d'Odal sans cadres, 9 icones, police Norse (bitmap), piece d'or (/menu, touche N, 8 icones) en plus de la boite de dialogue.
+  { name: 'islandfactionsgui-3.4.10.jar', sha256: '8ac691708ac1d9c37632e6f2aaae582abb5f71c5d6a345feeae7fdcb0a89490d' },
   // Compagnons d'Odal 2.0.0 : menu compagnon et cosmetiques (plugin Paper OdalCompanion en face).
-  { name: 'odalcompanion-2.13.3.jar', sha256: 'b394dcb8a2ac85263929bb7c907aff08f607fc992bf62d5dadfe053b2a149af9' },
+  // 2.13.4 (17/11 soir) : six bannieres de categorie refaites (boutique festive, aspect Minecraft).
+  { name: 'odalcompanion-2.13.4.jar', sha256: '2a6e41d336c7ec60a027e036ef17c6d271376f8813b2ff2feb2c86c313c281d9' },
   // Carte d'Odal : la Dynmap en jeu, minimap, reperes et claims a la souris. Remplace Xaero ;
   // epinglee comme les autres mods maison, le plugin IslandFactions parle son protocole.
   { name: 'odalcarte-2.7.12.jar', sha256: '8714ac58d6786e386fabc9b1b747173d14fb2ff75566c0537c529067949f4753' },
